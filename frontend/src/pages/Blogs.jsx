@@ -10,7 +10,10 @@ const Blogs = () => {
     const fetchBlogs = async () => {
       try {
         const res = await API.get("/blogs");
-        setBlogs(res.data);
+        const sortedBlogs = res.data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setBlogs(sortedBlogs);
       } catch (error) {
         console.log(error);
       }
@@ -21,7 +24,7 @@ const Blogs = () => {
 
   return (
     <div className="blogs-container">
-      <h2>Mangalam's Blog</h2>
+      {/* <h2>mangalam&apos;s blog</h2> */}
       {blogs.length === 0 ? (
         <p>No blogs yet. Add one!</p>
       ) : (

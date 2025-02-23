@@ -1,13 +1,21 @@
 .navbar {
   display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
   justify-content: space-between;
-  padding: 10px 20px;
-  background: #007bff;
+  padding: 1.8rem 0;
+  background: #222831;
   color: white;
+  box-shadow: 0 10px 4px rgba(3, 97, 121, 0.1); /* Optional: Adds a slight shadow */
+  z-index: 1000;
 }
 
+
 .navbar a {
-  color: white;
+  color: #EEEEEE;
   text-decoration: none;
-  margin: 0 10px;
+  margin: 0 8rem;
+  font-size: 40px;
 }

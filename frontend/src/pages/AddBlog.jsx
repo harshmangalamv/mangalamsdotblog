@@ -1,5 +1,4 @@
 import { useState } from "react";
-import API from "../api";
 import { useNavigate } from "react-router-dom";
 import "../styles/addBlog.css";
 import axios from "axios";
@@ -47,7 +46,7 @@ const AddBlog = () => {
           onChange={(e) => setContent(e.target.value)}
           required
         ></textarea>
-        <button type="submit">Add Blog</button>
+        <button type="submit">add blog</button>
       </form>
     </div>
   );

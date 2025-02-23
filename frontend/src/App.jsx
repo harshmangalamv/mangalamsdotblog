@@ -5,6 +5,7 @@ import BlogDetail from "./pages/BlogDetail";
 import AddBlog from "./pages/AddBlog";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
+import "./App.css";
 
 function App() {
   return (
