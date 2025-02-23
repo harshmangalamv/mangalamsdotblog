@@ -1,0 +1,30 @@
+.add-blog {
+  max-width: 500px;
+  margin: auto;
+  padding: 20px;
+  text-align: center;
+}
+
+.add-blog form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.add-blog input,
+.add-blog textarea {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+.add-blog button {
+  padding: 10px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
