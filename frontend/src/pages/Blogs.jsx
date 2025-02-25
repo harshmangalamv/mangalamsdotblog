@@ -23,7 +23,7 @@ const Blogs = () => {
   }, []);
 
   return (
-    <div className="blogs-container">
+    <div className="blogs-container blog-content">
       {/* <h2>mangalam&apos;s blog</h2> */}
       {blogs.length === 0 ? (
         <p>No blogs yet. Add one!</p>

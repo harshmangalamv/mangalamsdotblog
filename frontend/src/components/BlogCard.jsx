@@ -11,7 +11,7 @@ const BlogCard = ({ blog }) => {
 
   return (
     <div
-      className="blog-card"
+      className="blog-card blog-content"
       onClick={handleClick}
       style={{ cursor: "pointer" }}
       data-date={moment(blog.createdAt)
@@ -20,7 +20,7 @@ const BlogCard = ({ blog }) => {
       // data-date={blog.createdAt}
     >
       <h3>{blog.title}</h3>
-      <p>{blog.content.slice(0, 100)}</p>
+      <p>{blog.content}</p>
       {/* <button className="read-more">Read More</button> */}
     </div>
   );

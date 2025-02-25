@@ -4,6 +4,21 @@
   padding: 20px;
 }
 
+.blog-content {
+  white-space: pre-line; /* Preserves new lines */
+}
+
+.blog-content::after {
+  content: attr(data-date); /* Uses the date from the HTML */
+  display: block;
+  text-align: right;
+  font-size: 0.85rem;
+  color: #222831;
+  margin-top: 0.5rem;
+  border-top: 2px solid #2f2626; /* The line */
+  padding-top: 5px;
+}
+
 .blog-card {
   padding: 15px;
   /* border: 1px solid #ddd; */

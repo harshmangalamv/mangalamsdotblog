@@ -3,3 +3,27 @@
   margin: auto;
   padding: 20px;
 }
+
+.blog-detail > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.edit-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.edit-btn svg {
+  color: #5c6c85; /* Adjust color as needed */
+  transition: color 0.2s;
+}
+
+.edit-btn:hover svg {
+  color: #222831; /* Darker on hover */
+}

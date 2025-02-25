@@ -4,6 +4,7 @@ body {
   font-family: garamond bold;
   color: #000000;
   margin: 0 0 0.5rem;
+  font-size: larger;
   /* padding-top: 100px; //Prevents content from being hidden under navbar */
   /* padding: 0; */
 }
