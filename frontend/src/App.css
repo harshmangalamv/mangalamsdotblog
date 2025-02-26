@@ -8,3 +8,26 @@ body {
   /* padding-top: 100px; //Prevents content from being hidden under navbar */
   /* padding: 0; */
 }
+
+/* blog-card */
+.blog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /*gap: 8px; /* Adjust spacing as needed */
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Adjust spacing between edit button & edited text */
+}
+
+.edit-status {
+  font-size: 0.85rem;
+  /* align-items: */
+  /* font: small; */
+  margin-left: auto;
+  color: gray;
+  opacity: 0.8; /* Faded look */
+}

@@ -36,3 +36,4 @@ backend/package-lock.json
 
 # Misc  
 *.log  
+*.to-do

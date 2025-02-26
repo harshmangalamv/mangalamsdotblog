@@ -22,7 +22,7 @@ router.post("/signup", async (req, res) => {
     user = new User({ username, email, password: hashedPassword });
     await user.save();
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
     res.status(201).json({ token, message: "User created successfully" });
   } catch (error) {
     res.status(500).json({ message: "Server Error" });
@@ -42,7 +42,7 @@ router.post("/login", async (req, res) => {
     if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
     // Generate Token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
     res.json({ token, user: { id: user._id, username: user.username, email: user.email } });
   } catch (error) {

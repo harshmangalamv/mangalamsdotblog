@@ -7,8 +7,21 @@ const BlogSchema = new mongoose.Schema({
   author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   createdAt: {
     type: Date,
-    default: () => moment().tz("Asia/Kolkata").toDate()
-  }
+    default: () => moment().tz("Asia/Kolkata").toDate(),
+    immutable: true,
+  },
+  updatedAt: {
+    type: Date,
+  },
+  versions: [
+    {
+      title: { type: String, required: true },
+      content: { type: String, required: true },
+      createdAt: {
+        type: Date,
+      }
+    },
+  ]
 }, { timestamps: false });
 
 const Blog = mongoose.model("Blog", BlogSchema);

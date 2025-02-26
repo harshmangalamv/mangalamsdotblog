@@ -8,6 +8,7 @@ import { FaRegEdit, FaEdit } from "react-icons/fa";
 const BlogDetail = () => {
   const { id } = useParams();
   const [blog, setBlog] = useState(null);
+  const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,33 +24,39 @@ const BlogDetail = () => {
     fetchBlog();
   }, [id]);
 
-  const [isHovered, setIsHovered] = useState(false);
   const onHandleClick = () => {
     console.log("editing blog: ", id);
     navigate(`/blogs/edit/${id}`);
   };
+
   if (!blog) return <p>Loading...</p>;
+
+  const { title, content, createdAt, updatedAt } = blog; // Now safe to destructure
 
   return (
     <div
       className="blog-detail blog-content"
-      data-date={moment(blog.createdAt)
+      data-date={moment(createdAt)
         .tz("Asia/Kolkata")
         .format("DD MMM YYYY, h:mm A")}
     >
       <div>
-        <h2>{blog.title}</h2>
-        {/* <button>edit</button> */}
-        <button
-          className="edit-btn"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          onClick={() => onHandleClick()}
-        >
-          {isHovered ? <FaEdit size={20} /> : <FaRegEdit size={19} />}
-        </button>
+        <h2>{title}</h2>
+        <div className="actions">
+          <div className="edit-status">
+            <span>{updatedAt ? "edited" : "original"}</span>
+          </div>
+          <button
+            className="edit-btn"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            onClick={() => onHandleClick()}
+          >
+            {isHovered ? <FaEdit size={20} /> : <FaRegEdit size={19} />}
+          </button>
+        </div>
       </div>
-      <p>{blog.content}</p>
+      <p>{content}</p>
     </div>
   );
 };

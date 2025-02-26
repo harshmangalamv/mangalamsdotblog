@@ -20,10 +20,10 @@
 }
 
 .edit-btn svg {
-  color: #5c6c85; /* Adjust color as needed */
+  color: #5c6c85;
   transition: color 0.2s;
 }
 
 .edit-btn:hover svg {
-  color: #222831; /* Darker on hover */
+  color: #222831;
 }

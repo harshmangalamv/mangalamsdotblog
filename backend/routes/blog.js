@@ -1,6 +1,7 @@
 import express from "express";
 import Blog from "../models/Blog.js";
 import authMiddleware from "../middleware/authMiddleware.js";
+import moment from "moment-timezone";
 
 const router = express.Router();
 
@@ -46,8 +47,19 @@ router.put("/:id", authMiddleware, async (req, res) => {
     if (blog.author.toString() !== req.user.id)
       return res.status(403).json({ message: "Not authorized" });
 
+    blog.versions.push({
+      title: blog.title,
+      content: blog.content,
+      createdAt: blog.updatedAt,
+    },)
+    console.log(blog);
+
+    blog.markModified("versions"); // Tell Mongoose that versions array changed
+
     blog.title = req.body.title || blog.title;
     blog.content = req.body.content || blog.content;
+    blog.updatedAt = moment().tz("Asia/Kolkata").toDate(); // Manual update
+
     await blog.save();
     res.json(blog);
   } catch (error) {
