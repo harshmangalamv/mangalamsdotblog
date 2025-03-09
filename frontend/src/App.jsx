@@ -5,6 +5,7 @@ import BlogDetail from "./pages/BlogDetail";
 import AddBlog from "./pages/AddBlog";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
+import Quotes from "./pages/Quotes";
 import "./App.css";
 import EditBlog from "./pages/EditBlog";
 
@@ -20,6 +21,7 @@ function App() {
         <Route path="/addBlog" element={<AddBlog />} />
         <Route path="/blogs/:id" element={<BlogDetail />} />
         <Route path="/blogs/edit/:id" element={<EditBlog />} />
+        <Route path="/quotes" element={<Quotes />} />
       </Routes>
     </Router>
   );

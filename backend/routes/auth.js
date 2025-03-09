@@ -29,7 +29,7 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-// Login Route
+// Login 
 router.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -42,9 +42,24 @@ router.post("/login", async (req, res) => {
     if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
     // Generate Token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign(
+      { 
+        id: user._id, 
+        isSuperUser: user.isSuperUser,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
-    res.json({ token, user: { id: user._id, username: user.username, email: user.email } });
+    res.json({
+      token, 
+      user: {
+        id: user._id,
+        isSuperUser: user.isSuperUser, 
+        username: user.username, 
+        email: user.email 
+      } 
+    });
   } catch (error) {
     res.status(500).json({ message: "Server Error" });
   }

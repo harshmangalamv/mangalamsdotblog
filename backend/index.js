@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import authRoutes from "./routes/auth.js";
 import blogRoutes from "./routes/blog.js";
+import quotesRoutes from "./routes/quotes.js";
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/blogs", blogRoutes);
+app.use("/api/quotes", quotesRoutes);
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,

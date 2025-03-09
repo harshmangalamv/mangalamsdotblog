@@ -17,24 +17,36 @@
   margin-top: 0.5rem;
   border-top: 2px solid #2f2626; /* The line */
   padding-top: 5px;
+  /*word-wrap: break-word; /* Ensures long words break */
+  /*overflow-wrap: break-word; /* Alternative for older browsers */
+  /*white-space: normal; /* Prevents text from staying in one line */
+  max-width: 100%;
+  word-break: break-all; /* Forces break anywhere if needed */
+  overflow-wrap: anywhere; /* Ensures break at any possible point */
+}
+
+.blog-content pre {
+  white-space: pre-wrap; /* Wraps long words inside code blocks */
+  overflow-x: auto; /* Enables scrolling for extra-long words */
+}
+
+.blog-content blockquote {
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .blog-card {
-  padding: 15px;
+  /* padding: 15px; */
   /* border: 1px solid #ddd; */
   /* border-radius: 5px; */
+  padding: 1rem;
   margin-bottom: 10px solid #000000;
+  margin-bottom: 1rem;
 }
 
 .read-more {
   color: #007bff;
   text-decoration: none;
-}
-
-.blog-card {
-  padding: 1rem;
-  /* border-bottom: 1px solid #ccc; Adds a straight line separator */
-  margin-bottom: 2rem;
 }
 
 .blog-card:last-child {

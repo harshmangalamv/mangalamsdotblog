@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import API from "../api";
 import BlogCard from "../components/BlogCard";
 import "../styles/blogs.css";
+import "../../src/App.css";
 
 const Blogs = () => {
   const [blogs, setBlogs] = useState([]);

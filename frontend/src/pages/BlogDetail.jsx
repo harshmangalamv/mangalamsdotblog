@@ -56,7 +56,7 @@ const BlogDetail = () => {
           </button>
         </div>
       </div>
-      <p>{content}</p>
+      <p className="content">{content}</p>
     </div>
   );
 };
