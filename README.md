@@ -6,7 +6,7 @@ Minimal vanilla JS blog app (no build step) with client-side routing and JSON-ba
 
 Use any one of these:
 - Python 3
-- Node.js (for `npx`)
+- Node.js (for index generation tooling)
 
 ## Run Locally
 
@@ -30,19 +30,80 @@ npx serve -s . -l 5500
 Then open:
 - http://localhost:5500/
 
+## Content Authoring Rules
+
+Post filename format (new posts):
+- `dd-mm-yyyy-N.json`
+- `N` is the post number for that date (1, 2, 3...)
+
+Examples:
+- `22-02-2026-1.json`
+- `22-02-2026-2.json`
+
+Post JSON shape:
+```json
+{
+  "title": "Post title",
+  "date": "2026-02-22",
+  "content": "<p>HTML content here</p>"
+}
+```
+
+## Index Build Tooling (Option 3)
+
+This project auto-generates index artifacts from post files.
+
+Generator command:
+```powershell
+npm run build:index
+```
+
+Generated files:
+- `data/blogIndex.json` (canonical metadata index)
+- `data/blogIndex.meta.json` (page size and totals)
+- `data/blogSlugMap.json` (slug -> post id)
+- `data/blogFeed.<hash>.page.N.json` (paged metadata for infinite scroll)
+
+How app loads data:
+- Home page fetches `blogIndex.meta.json`, then `${pageFilePrefix}.1.json`, then page 2/3/... on scroll.
+- Blog detail page fetches full content only after click via `blogSlugMap.json` + `/data/<id>.json`.
+
+## GitHub Automation
+
+Workflow file:
+- `.github/workflows/build-index.yml`
+
+Behavior:
+- On push to `main` (when `data/*.json`, script, or `package.json` changes), GitHub Actions runs `npm run build:index`.
+- If generated index files changed, the workflow commits and pushes them.
+
+## Git Push Safety
+
+Commit/push these:
+- `index.html`, `src/`, `css/`, `assets/`
+- `scripts/build-index.mjs`
+- `data/dd-mm-yyyy-N.json` post files
+- generated index artifacts used by the app:
+  - `data/blogIndex.json`
+  - `data/blogIndex.meta.json`
+  - `data/blogSlugMap.json`
+  - `data/blogFeed.<hash>.page.N.json`
+- `.github/workflows/build-index.yml`, `package.json`, `README.md`, `.gitignore`
+
+Do not push (ignored by `.gitignore`):
+- `node_modules/`
+- editor/OS junk (`.vscode/`, `.idea/`, `.DS_Store`, `Thumbs.db`)
+- temp files (`*.tmp`, `*.temp`)
+- legacy unused data:
+  - `data/posts/`
+  - `data/blogIndex.page.*.json`
+  - old-format post files (`data/yyyy-mm-dd-*.json`)
+
 ## Important Notes
 
 - Do not open `index.html` directly from the file system (`file://...`). The app loads JSON via `fetch`, which requires HTTP.
 - Start the server from the repository root so paths like `/src/main.js` and `/data/...` resolve correctly.
 - Routing is client-side (`/`, `/about`, and blog slugs). If your server does not support SPA fallback, opening or refreshing deep links directly may return 404.
-
-## Project Structure
-
-- `index.html`: app entry point
-- `src/main.js`: bootstraps route resolution
-- `src/runtime/router.js`: route handling
-- `data/`: post index and post JSON files
-- `css/style.css`: styling
 
 ## Product Direction
 

@@ -1,0 +1,72 @@
+[
+  {
+    "id": "26-02-2026-1",
+    "title": "Avoid Fancy Naming",
+    "date": "2026-02-26",
+    "slug": "avoid-fancy-naming",
+    "excerpt": "Simple names reduce onboarding time. If naming sounds clever, it is probably unclear."
+  },
+  {
+    "id": "25-02-2026-1",
+    "title": "The Architecture of Boredom",
+    "date": "2026-02-25",
+    "slug": "the-architecture-of-boredom",
+    "excerpt": "Great systems often feel boring to maintain. Boring is a feature when uptime matters."
+  },
+  {
+    "id": "24-02-2026-1",
+    "title": "Text First Design",
+    "date": "2026-02-24",
+    "slug": "text-first-design",
+    "excerpt": "If the words are weak, no styling can save the page. Strong text can survive plain styling."
+  },
+  {
+    "id": "23-02-2026-1",
+    "title": "Ship Fewer Features",
+    "date": "2026-02-23",
+    "slug": "ship-fewer-features",
+    "excerpt": "Complexity grows faster than value. Each feature should defend its existence."
+  },
+  {
+    "id": "22-02-2026-1",
+    "title": "Learning by Rebuilding",
+    "date": "2026-02-22",
+    "slug": "learning-by-rebuilding",
+    "excerpt": "Rebuilding tiny tools teaches architecture faster than passive tutorials. Make it small enough to finish."
+  },
+  {
+    "id": "21-02-2026-1",
+    "title": "Sharpen the Question",
+    "date": "2026-02-21",
+    "slug": "sharpen-the-question",
+    "excerpt": "Before solving, sharpen the question. A precise question removes half the work."
+  },
+  {
+    "id": "20-02-2026-1",
+    "title": "The Quiet Advantage",
+    "date": "2026-02-20",
+    "slug": "the-quiet-advantage",
+    "excerpt": "Calm execution is underrated. Most outcomes come from steady work, not loud announcements."
+  },
+  {
+    "id": "19-02-2026-1",
+    "title": "The Cost of Context Switching",
+    "date": "2026-02-19",
+    "slug": "the-cost-of-context-switching",
+    "excerpt": "Switching tasks feels productive because it feels busy. But it kills deep work."
+  },
+  {
+    "id": "18-02-2026-1",
+    "title": "Against Dashboard Culture",
+    "date": "2026-02-18",
+    "slug": "against-dashboard-culture",
+    "excerpt": "Not everything needs a chart. Sometimes a short paragraph with one decision is enough."
+  },
+  {
+    "id": "17-02-2026-1",
+    "title": "Simple Sites Age Well",
+    "date": "2026-02-17",
+    "slug": "simple-sites-age-well",
+    "excerpt": "Static pages with clear text outlive trendy redesigns. I want this site to still feel readable years later."
+  }
+]

@@ -1,0 +1,7 @@
+{
+  "name": "mangalamsdotblog",
+  "private": true,
+  "scripts": {
+    "build:index": "node scripts/build-index.mjs"
+  }
+}

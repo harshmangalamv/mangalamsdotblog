@@ -1,0 +1,42 @@
+name: Build Blog Index
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "data/*.json"
+      - "scripts/build-index.mjs"
+      - "package.json"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-index:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Generate Index Files
+        run: npm run build:index
+
+      - name: Commit Generated Index Files
+        run: |
+          if [ -n "$(git status --porcelain -- data/*.json)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add data/*.json
+            git commit -m "chore: rebuild blog index files"
+            git push
+          else
+            echo "No generated changes to commit."
+          fi

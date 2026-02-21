@@ -1,0 +1,72 @@
+[
+  {
+    "id": "16-02-2026-1",
+    "title": "The Draft Is the Thinking",
+    "date": "2026-02-16",
+    "slug": "the-draft-is-the-thinking",
+    "excerpt": "I used to think writing starts after thinking. Now I think writing is the thinking."
+  },
+  {
+    "id": "15-02-2026-1",
+    "title": "Respect the Reader",
+    "date": "2026-02-15",
+    "slug": "respect-the-reader",
+    "excerpt": "Readers do not owe me attention. If the first three lines are vague, the post is not ready."
+  },
+  {
+    "id": "14-02-2026-1",
+    "title": "Keep the Stack Small",
+    "date": "2026-02-14",
+    "slug": "keep-the-stack-small",
+    "excerpt": "Each extra dependency is a future decision tax. Minimal tools force clearer architecture."
+  },
+  {
+    "id": "13-02-2026-1",
+    "title": "Thinking in First Principles",
+    "date": "2026-02-13",
+    "slug": "thinking-in-first-principles",
+    "excerpt": "Borrowing conclusions is fast, but brittle. Borrowing questions is better."
+  },
+  {
+    "id": "12-02-2026-1",
+    "title": "Compounding Habits",
+    "date": "2026-02-12",
+    "slug": "compounding-habits",
+    "excerpt": "The boring habit is often the compounding one. Read daily, write daily, ship weekly."
+  },
+  {
+    "id": "11-02-2026-1",
+    "title": "On Useful Ambition",
+    "date": "2026-02-11",
+    "slug": "on-useful-ambition",
+    "excerpt": "Ambition without direction becomes anxiety. Direction comes from choosing a problem and sticking with it."
+  },
+  {
+    "id": "10-02-2026-1",
+    "title": "Build In Public Carefully",
+    "date": "2026-02-10",
+    "slug": "build-in-public-carefully",
+    "excerpt": "Publishing progress is useful. Publishing confusion is noise. The difference is whether the update helps someone else."
+  },
+  {
+    "id": "09-02-2026-1",
+    "title": "Notes Over Opinions",
+    "date": "2026-02-09",
+    "slug": "notes-over-opinions",
+    "excerpt": "Opinions age quickly. Notes age better. So I am writing notes from projects, books, and mistakes."
+  },
+  {
+    "id": "08-02-2026-1",
+    "title": "Write What You Can Defend",
+    "date": "2026-02-08",
+    "slug": "write-what-you-can-defend",
+    "excerpt": "Hot takes are easy. Defensible takes are harder. I want posts that survive a reread six months later."
+  },
+  {
+    "id": "07-02-2026-1",
+    "title": "Seventh Entry",
+    "date": "2026-02-07",
+    "slug": "seventh-entry",
+    "excerpt": "This blog engine is now behaving like a real publishing platform."
+  }
+]

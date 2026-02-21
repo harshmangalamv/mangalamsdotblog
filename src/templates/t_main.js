@@ -11,8 +11,10 @@ export function t_main({ title, content }) {
                 </nav>
             </aside>
 
-            <main class="content">
-                ${content}
+            <main id="contentPane" class="content-pane">
+                <div class="content">
+                    ${content}
+                </div>
             </main>
 
         </div>

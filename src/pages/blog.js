@@ -1,33 +1,34 @@
-import { mount, loadJSON, makeSlug } from "../runtime/runtime.js";
+import { mount, loadJSON } from "../runtime/runtime.js";
 import { t_blog } from "../templates/t_blog.js";
+import { t_main } from "../templates/t_main.js";
 
 export async function blogPage(slug) {
-
   try {
+    const slugMap = await loadJSON("/data/blogSlugMap.json");
+    const id = slugMap[slug];
 
-    const index = await loadJSON("/data/blogIndex.json");
-
-    // Resolve slug from the same index used on home page.
-    const match = index.find((post) => makeSlug(post.title) === slug);
-
-    if (!match) {
+    if (!id) {
       throw new Error("not found");
     }
 
-    const data = await loadJSON(`/data/${match.id}.json`);
+    const data = await loadJSON(`/data/${id}.json`);
 
     mount(
-      t_blog({
-        title: data.title,
-        date: data.date,
-        content: data.content
+      t_main({
+        title: "mangalams.blog",
+        content: t_blog({
+          title: data.title,
+          date: data.date,
+          content: data.content
+        })
       })
     );
-
   } catch {
-
-    mount(`<div class="content"><h1>Not Found</h1></div>`);
+    mount(
+      t_main({
+        title: "mangalams.blog",
+        content: `<article class="post"><h1 class="post-title">Not Found</h1></article>`
+      })
+    );
   }
 }
-
-

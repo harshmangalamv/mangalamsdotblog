@@ -1,7 +1,8 @@
 export function t_blogPreview({ id, slug, title, date, content }) {
 
-  // limit preview length
-  const preview = content.substring(0, 280) + "...";
+  const preview = content.length > 280
+    ? content.substring(0, 280) + "..."
+    : content;
 
   return `
         <article class="blog-preview">
