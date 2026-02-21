@@ -7,6 +7,7 @@ let totalPages = 1;
 let loading = false;
 let contentScroller = null;
 let pageFilePrefix = "blogFeed.page";
+let inFlightLoad = null;
 
 let feedCache = [];
 
@@ -39,9 +40,12 @@ export async function homePage() {
     document.getElementById("feed").innerHTML = feedCache.join("");
     attachLinks();
 
-    setTimeout(() => {
-      contentScroller.scrollTop = parseInt(sessionStorage.getItem(FEED_SCROLL_KEY) || "0", 10);
-    }, 10);
+    const savedScroll = parseInt(sessionStorage.getItem(FEED_SCROLL_KEY) || "0", 10);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        contentScroller.scrollTop = savedScroll;
+      });
+    });
   } else {
     sessionStorage.removeItem(FEED_CACHE_KEY);
     sessionStorage.removeItem(FEED_PAGE_KEY);
@@ -61,35 +65,38 @@ async function loadNextPage() {
   if (currentPage > totalPages) return;
 
   loading = true;
+  inFlightLoad = (async () => {
+    const feed = document.getElementById("feed");
 
-  const feed = document.getElementById("feed");
+    try {
+      const pagePosts = await loadJSON(`/data/${pageFilePrefix}.${currentPage}.json`);
 
-  try {
-    const pagePosts = await loadJSON(`/data/${pageFilePrefix}.${currentPage}.json`);
+      for (const post of pagePosts) {
+        const html = t_blogPreview({
+          id: post.id,
+          slug: post.slug,
+          title: post.title,
+          date: post.date,
+          content: post.excerpt
+        });
 
-    for (const post of pagePosts) {
-      const html = t_blogPreview({
-        id: post.id,
-        slug: post.slug,
-        title: post.title,
-        date: post.date,
-        content: post.excerpt
-      });
+        feedCache.push(html);
+        feed.innerHTML += html;
+      }
 
-      feedCache.push(html);
-      feed.innerHTML += html;
+      currentPage += 1;
+
+      sessionStorage.setItem(FEED_CACHE_KEY, JSON.stringify(feedCache));
+      sessionStorage.setItem(FEED_PAGE_KEY, String(currentPage));
+
+      attachLinks();
+    } catch {
+      // Keep current content if the next page cannot be loaded.
     }
+  })();
 
-    currentPage += 1;
-
-    sessionStorage.setItem(FEED_CACHE_KEY, JSON.stringify(feedCache));
-    sessionStorage.setItem(FEED_PAGE_KEY, String(currentPage));
-
-    attachLinks();
-  } catch {
-    // Keep current content if the next page cannot be loaded.
-  }
-
+  await inFlightLoad;
+  inFlightLoad = null;
   loading = false;
 }
 
@@ -108,10 +115,17 @@ function handleScroll() {
 
 function attachLinks() {
   document.querySelectorAll(".blogLink").forEach((el) => {
-    el.onclick = (e) => {
+    el.onclick = async (e) => {
       e.preventDefault();
 
-      // Persist exact position right before route change.
+      // If a next page is loading, wait so cache/page state is complete.
+      if (loading && inFlightLoad) {
+        await inFlightLoad;
+      }
+
+      // Persist exact feed snapshot right before route change.
+      sessionStorage.setItem(FEED_CACHE_KEY, JSON.stringify(feedCache));
+      sessionStorage.setItem(FEED_PAGE_KEY, String(currentPage));
       sessionStorage.setItem(FEED_SCROLL_KEY, String(contentScroller ? contentScroller.scrollTop : 0));
 
       navigate(`/${el.dataset.slug}`);
