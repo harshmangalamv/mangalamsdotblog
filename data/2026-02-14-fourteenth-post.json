@@ -1,0 +1,5 @@
+{
+    "title":  "Keep the Stack Small",
+    "date":  "2026-02-14",
+    "content":  "\u003cp\u003eEach extra dependency is a future decision tax.\u003c/p\u003e\u003cp\u003eMinimal tools force clearer architecture.\u003c/p\u003e"
+}

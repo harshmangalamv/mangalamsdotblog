@@ -1,0 +1,97 @@
+/* =========================
+   BASE
+========================= */
+
+body {
+    margin: 0;
+    background: #f6f6f6;
+    color: #111;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 18px;
+}
+
+/* =========================
+   GRID LAYOUT
+========================= */
+
+.layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    max-width: 1100px;
+    margin: 60px auto;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar {
+    padding-right: 40px;
+}
+
+.site-title {
+    font-size: 26px;
+    font-weight: normal;
+    margin-bottom: 30px;
+}
+
+.menu p {
+    margin: 10px 0;
+}
+
+.menu a {
+    text-decoration: none;
+    color: #111;
+}
+
+.menu a:hover {
+    text-decoration: underline;
+}
+
+/* =========================
+   CONTENT AREA
+========================= */
+
+.content {
+    max-width: 680px;   /* 🔥 narrow reading column */
+    line-height: 1.75;
+    letter-spacing: 0.2px;
+}
+
+/* Titles */
+.content h1 {
+    font-size: 34px;
+    font-weight: normal;
+    margin-bottom: 18px;
+}
+
+/* Paragraph rhythm */
+.content p {
+    margin: 0 0 16px 0;
+}
+
+/* Links */
+.content a {
+    color: #111;
+    text-decoration: underline;
+}
+
+.content a:hover {
+    opacity: 0.7;
+}
+
+/* Blog list date style */
+.blog-date {
+    color: #777;
+    margin-right: 8px;
+}
+
+/* previw sectoin */
+.blog-preview {
+    margin-bottom: 40px;
+}
+
+.blog-preview h2 {
+    font-weight: normal;
+    margin-bottom: 8px;
+}
