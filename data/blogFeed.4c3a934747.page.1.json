@@ -1,0 +1,72 @@
+[
+  {
+    "id": "08-03-2026-1",
+    "title": "Static by Default",
+    "date": "2026-03-08",
+    "slug": "static-by-default",
+    "excerpt": "For writing-heavy projects, static hosting is an advantage. Fast deploys and low ops are exactly the point."
+  },
+  {
+    "id": "07-03-2026-1",
+    "title": "Audience of One",
+    "date": "2026-03-07",
+    "slug": "audience-of-one",
+    "excerpt": "I write for one serious reader at a time. If that reader finds value, distribution can come later."
+  },
+  {
+    "id": "06-03-2026-1",
+    "title": "Make Constraints Visible",
+    "date": "2026-03-06",
+    "slug": "make-constraints-visible",
+    "excerpt": "Hidden constraints cause bad plans. Visible constraints create better tradeoffs."
+  },
+  {
+    "id": "05-03-2026-1",
+    "title": "Earned Confidence",
+    "date": "2026-03-05",
+    "slug": "earned-confidence",
+    "excerpt": "Confidence without reps is theater. Confidence with reps is calm."
+  },
+  {
+    "id": "04-03-2026-1",
+    "title": "Aim for Clarity",
+    "date": "2026-03-04",
+    "slug": "aim-for-clarity",
+    "excerpt": "Clarity is an engineering decision, not just a writing style. Clear code and clear text come from the same discipline."
+  },
+  {
+    "id": "03-03-2026-1",
+    "title": "The Durable Internet",
+    "date": "2026-03-03",
+    "slug": "the-durable-internet",
+    "excerpt": "I admire sites that are mostly plain text and ideas. They feel lighter and age better."
+  },
+  {
+    "id": "02-03-2026-1",
+    "title": "Good Friction",
+    "date": "2026-03-02",
+    "slug": "good-friction",
+    "excerpt": "Not all friction is bad. A little friction can prevent expensive mistakes."
+  },
+  {
+    "id": "01-03-2026-1",
+    "title": "Defaults Matter",
+    "date": "2026-03-01",
+    "slug": "defaults-matter",
+    "excerpt": "Defaults decide outcomes at scale. Choose defaults that help even when nobody is paying attention."
+  },
+  {
+    "id": "28-02-2026-1",
+    "title": "Write for Future You",
+    "date": "2026-02-28",
+    "slug": "write-for-future-you",
+    "excerpt": "Future me will forget assumptions. Good notes are a gift across time."
+  },
+  {
+    "id": "27-02-2026-1",
+    "title": "Small Batches",
+    "date": "2026-02-27",
+    "slug": "small-batches",
+    "excerpt": "Large releases hide risk. Small batches reveal risk early while it is cheap."
+  }
+]
