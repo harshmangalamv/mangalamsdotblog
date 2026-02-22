@@ -1,5 +1,0 @@
-{
-    "title":  "Make Constraints Visible",
-    "date":  "2026-03-06",
-    "content":  "\u003cp\u003eHidden constraints cause bad plans.\u003c/p\u003e\u003cp\u003eVisible constraints create better tradeoffs.\u003c/p\u003e"
-}
