@@ -92,8 +92,8 @@ body {
     max-width: 600px;   /* tighter reading column */
     line-height: 1.8;
     letter-spacing: 0.1px;
-    margin-top: 70px;
-    padding: 0 0 90px 0;
+    margin-top: 52px;
+    padding: 0 0 64px 0;
 }
 
 /* Titles */
@@ -101,13 +101,13 @@ body {
     font-size: 38px;
     font-weight: normal;
     line-height: 1.22;
-    margin: 0 0 18px 0;
+    margin: 0 0 14px 0;
     letter-spacing: -0.25px;
 }
 
 /* Paragraph rhythm */
 .content p {
-    margin: 0 0 18px 0;
+    margin: 0 0 14px 0;
 }
 
 /* Links */
@@ -135,19 +135,19 @@ body {
 /* preview section */
 .blog-preview {
     margin: 0;
-    padding: 0 0 30px 0;
+    padding: 0 0 22px 0;
     border-bottom: 1px solid var(--rule);
 }
 
 .blog-preview + .blog-preview {
-    margin-top: 28px;
+    margin-top: 18px;
 }
 
 .blog-preview h2 {
     font-size: 32px;
     font-weight: normal;
     line-height: 1.28;
-    margin: 0 0 8px 0;
+    margin: 0 0 6px 0;
     letter-spacing: -0.2px;
 }
 
@@ -158,44 +158,47 @@ body {
 /* single post page */
 .post {
     max-width: 600px;
-    padding: 64px 0 104px 0;
+    padding: 44px 0 72px 0;
 }
 
 .post-title {
-    font-size: 48px;
+    /* font-family: "Avenir Next", "Segoe UI Variable Text", "Segoe UI", "Helvetica Neue", sans-serif; */
+    font-size: 58px;
     font-weight: 800;
-    line-height: 1.18;
-    letter-spacing: -0.35px;
+    line-height: 1.08;
+    letter-spacing: -0.6px;
     margin: 0 0 12px 0;
 }
 
 .post-meta {
     color: var(--muted);
     font-size: 15px;
-    margin: 0 0 36px 0;
+    margin: 0 0 28px 0;
     letter-spacing: 0.25px;
 }
 
-.post-body {
-    font-size: 22px;
-    line-height: 1.88;
-    color: #21201c;
+.post .post-body {
+    font-size: 20px;
+    line-height: 1.48;
+    /* color: #111a24; */
+    color: #37352f;
+    letter-spacing: 0;
 }
 
-.post-body p {
-    margin: 0 0 22px 0;
+.post .post-body p {
+    margin: 0 0 18px 0;
 }
 
-.post-body h2,
-.post-body h3 {
+.post .post-body h2,
+.post .post-body h3 {
     font-weight: normal;
     line-height: 1.28;
-    margin: 44px 0 14px 0;
+    margin: 30px 0 10px 0;
     letter-spacing: -0.15px;
 }
 
-.post-body blockquote {
-    margin: 28px 0;
+.post .post-body blockquote {
+    margin: 20px 0;
     padding: 4px 0 4px 18px;
     border-left: 2px solid #c6bfae;
     color: #37352f;
@@ -226,7 +229,7 @@ body {
 
     .content {
         margin-top: 0;
-        padding-bottom: 50px;
+        padding-bottom: 36px;
     }
 
     .blog-preview h2 {
@@ -234,11 +237,11 @@ body {
     }
 
     .post-title {
-        font-size: 38px;
+        font-size: 42px;
     }
 
-    .post-body {
-        font-size: 20px;
-        line-height: 1.82;
+    .post .post-body {
+        font-size: 19px;
+        line-height: 1.44;
     }
 }
