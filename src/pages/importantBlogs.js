@@ -1,4 +1,4 @@
-import { mount, loadJSON, navigate } from "../runtime/runtime.js";
+import { mount, loadJSON, navigate, formatDateLong } from "../runtime/runtime.js";
 import { t_main } from "../templates/t_main.js";
 import { t_blogPreview } from "../templates/t_blogPreview.js";
 
@@ -76,7 +76,7 @@ async function loadNextPage() {
           id: post.id,
           slug: post.slug,
           title: post.title,
-          date: post.date,
+          date: formatDateLong(post.date),
           content: post.excerpt
         });
 

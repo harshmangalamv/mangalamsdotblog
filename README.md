@@ -32,30 +32,55 @@ Then open:
 
 ## Content Authoring Rules
 
-Post filename format (new posts):
-- `dd-mm-yyyy-N.json`
+Source of truth:
+- Write raw posts in `posts_raw/`.
+
+Raw post filename format:
+- `dd-mm-yyyy-N.txt`
 - `N` is the post number for that date (1, 2, 3...)
 
 Examples:
-- `22-02-2026-1.json`
-- `22-02-2026-2.json`
+- `22-02-2026-1.txt`
+- `22-02-2026-2.txt`
 
-Post JSON shape:
-```json
-{
-  "title": "Post title",
-  "date": "2026-02-22",
-  "content": "<p>HTML content here</p>"
-}
+Raw file format:
+```txt
+Title: Your title
+Date: 2026-02-22
+
+First paragraph.
+
+Second paragraph.
 ```
+
+Parsing rules:
+- 2+ blank lines = new paragraph
+- single line breaks inside a paragraph become spaces
+- tabs/multiple spaces are normalized
+- output HTML is escaped and wrapped in `<p>...</p>`
 
 ## Index Build Tooling (Option 3)
 
 This project auto-generates index artifacts from post files.
 
-Generator command:
+Generate content JSON from raw source:
+```powershell
+npm run build:content
+```
+
+Generate index artifacts:
 ```powershell
 npm run build:index
+```
+
+Do both:
+```powershell
+npm run build:all
+```
+
+Generate only one post:
+```powershell
+node scripts/parse-raw-posts.mjs --file posts_raw\\22-02-2026-1.txt
 ```
 
 Generated files:
@@ -74,8 +99,8 @@ Workflow file:
 - `.github/workflows/build-index.yml`
 
 Behavior:
-- On push to `main` (when `data/*.json`, script, or `package.json` changes), GitHub Actions runs `npm run build:index`.
-- If generated index files changed, the workflow commits and pushes them.
+- On push to `main` (when raw posts, scripts, data, or `package.json` changes), GitHub Actions runs `npm run build:all`.
+- If generated data files changed, the workflow commits and pushes them.
 
 ## Git Push Safety
 

@@ -2,6 +2,8 @@
   "name": "mangalamsdotblog",
   "private": true,
   "scripts": {
-    "build:index": "node scripts/build-index.mjs"
+    "build:content": "node scripts/parse-raw-posts.mjs --all",
+    "build:index": "node scripts/build-index.mjs",
+    "build:all": "npm run build:content && npm run build:index"
   }
 }

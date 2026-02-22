@@ -6,7 +6,9 @@ on:
       - main
     paths:
       - "data/*.json"
+      - "posts_raw/*"
       - "scripts/build-index.mjs"
+      - "scripts/parse-raw-posts.mjs"
       - "package.json"
   workflow_dispatch:
 
@@ -26,16 +28,16 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Generate Index Files
-        run: npm run build:index
+      - name: Generate Content and Index Files
+        run: npm run build:all
 
-      - name: Commit Generated Index Files
+      - name: Commit Generated Files
         run: |
           if [ -n "$(git status --porcelain -- data/*.json)" ]; then
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add data/*.json
-            git commit -m "chore: rebuild blog index files"
+            git commit -m "chore: rebuild blog content and index"
             git push
           else
             echo "No generated changes to commit."

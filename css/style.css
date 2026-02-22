@@ -89,7 +89,7 @@ body {
 }
 
 .content {
-    max-width: 680px;   /* narrow reading column */
+    max-width: 600px;   /* tighter reading column */
     line-height: 1.8;
     letter-spacing: 0.1px;
     margin-top: 70px;
@@ -157,7 +157,7 @@ body {
 
 /* single post page */
 .post {
-    max-width: 680px;
+    max-width: 600px;
     padding: 64px 0 104px 0;
 }
 

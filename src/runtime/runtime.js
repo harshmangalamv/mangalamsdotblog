@@ -37,8 +37,20 @@ export function append(html) {
 export function makeSlug(title) {
   return title
     .toLowerCase()
-    .replace(/[^\w\s-]/g, "")   // remove special chars
+    .replace(/[^\w\s-]/g, "")
     .trim()
-    .replace(/\s+/g, "-");      // spaces → -
+    .replace(/\s+/g, "-");
 }
 
+export function formatDateLong(dateString) {
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) {
+    return dateString;
+  }
+
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
+}

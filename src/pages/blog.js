@@ -1,4 +1,4 @@
-import { mount, loadJSON } from "../runtime/runtime.js";
+import { mount, loadJSON, formatDateLong } from "../runtime/runtime.js";
 import { t_blog } from "../templates/t_blog.js";
 import { t_main } from "../templates/t_main.js";
 
@@ -18,7 +18,7 @@ export async function blogPage(slug) {
         title: "mangalams.blog",
         content: t_blog({
           title: data.title,
-          date: data.date,
+          date: formatDateLong(data.date),
           content: data.content
         })
       })
