@@ -59,6 +59,17 @@ The first time a post is built, its URL is chosen from the title (`/my-title/`) 
 
 Commit `slugs.json` along with your posts. If you push a post without building first, CI records the URL and commits `slugs.json` for you, so run `git pull` before your next push.
 
+## Search engines
+
+Built in on every build, nothing to do per post:
+- A `<title>`, description, canonical URL and Open Graph tags on every page; your name in the home and About titles.
+- Structured data (schema.org JSON-LD, `scripts/lib/seo.mjs`): `WebSite` + `Person` on the home page, `BlogPosting` on each essay, `ProfilePage` on About. `Person.sameAs` and `<link rel="me">` list the profiles in `site.config.json` → `profiles`, which is how Google connects the site to your name.
+- `sitemap.xml` (with dates), `robots.txt`, real 404s, permanent URLs, fast static pages, mobile-friendly layout.
+
+One-time setup (done by hand, see the steps in CLAUDE.md › Search engines): verify the domain in Google Search Console and Bing Webmaster Tools, submit the sitemap, and link the blog from your GitHub and LinkedIn profiles.
+
+Good habits per essay: a specific title, a `Description:` line for anything long, a link to related earlier essays, and sources linked in footnotes.
+
 ## Other pages
 
 `pages_raw/about.txt` becomes `/about/`. Any other `pages_raw/<name>.txt` becomes `/<name>/` and appears in the menu. It uses the same format, with only `Title:` and `Description:` headers.

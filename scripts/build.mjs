@@ -14,6 +14,7 @@ import { readPosts, readPages, ContentError } from "./lib/content.mjs";
 import { assignSlugs, SlugError } from "./lib/slugs.mjs";
 import { truncateWords, SLUG_PATTERN } from "./lib/util.mjs";
 import * as t from "./lib/templates.mjs";
+import * as seo from "./lib/seo.mjs";
 
 // Top-level paths the site itself uses; a post can never take these URLs.
 const RESERVED = ["archive", "assets", "css", "data", "js", "feed", "rss", "atom", "page", "tag", "tags", "search", "404", "index"];
@@ -104,6 +105,8 @@ export async function build({ root = process.cwd(), outDir = path.join(root, "di
     if (await exists(path.join(root, file))) await fs.copyFile(path.join(root, file), path.join(resolvedOut, file));
   }
 
+  if (pages.about) site.aboutUrl = `${site.url}/about/`;
+
   site.nav = [
     { key: "home", label: "Home", href: "/" },
     { key: "archive", label: "Archive", href: "/archive/" },
@@ -143,6 +146,7 @@ export async function build({ root = process.cwd(), outDir = path.join(root, "di
       type: "article",
       date: post.date,
       noindex: post.draft,
+      structured: post.draft ? [] : [seo.blogPosting(site, post)],
       body: t.postBody(post, { older: post.older, newer: post.newer }),
     });
     await writeFile(resolvedOut, `${post.slug}/index.html`, html);
@@ -164,10 +168,13 @@ export async function build({ root = process.cwd(), outDir = path.join(root, "di
     resolvedOut,
     "index.html",
     t.layout(site, {
-      title: site.title,
+      // The author's name in the home title helps searches for the name find the site.
+      title: `${site.title} · ${site.author}`,
+      ogTitle: site.title,
       description: site.description,
       path: "/",
       current: "home",
+      structured: [seo.website(site), seo.person(site)],
       body: t.homeBody(previews.slice(0, site.pageSize).join("\n"), { pages: pageCount, prefix, key: feedKey }, site),
       scripts: pageCount > 1 ? [site.assets.feedJs] : [],
     })
@@ -190,10 +197,12 @@ export async function build({ root = process.cwd(), outDir = path.join(root, "di
       resolvedOut,
       `${name}/index.html`,
       t.layout(site, {
-        title: `${pg.title} · ${site.title}`,
+        // The About page carries the author's name in its title for name searches.
+        title: name === "about" ? `${pg.title} · ${site.author}` : `${pg.title} · ${site.title}`,
         description: pg.description || truncateWords(pg.text, 160) || site.description,
         path: `/${name}/`,
         current: name,
+        structured: name === "about" ? [seo.profilePage(site, "/about/")] : [],
         body: t.pageBody(pg),
       })
     );

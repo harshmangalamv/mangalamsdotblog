@@ -32,6 +32,7 @@ Every page is complete HTML, so it works with JS disabled. The only JS is `src/f
 | `scripts/lib/markup.mjs` | small Markdown subset → HTML. Always escapes; links must be https/mailto/`/path` |
 | `scripts/lib/slugs.mjs` | URL registry logic (`assignSlugs`) |
 | `scripts/lib/templates.mjs` | all HTML/XML templates. Escapes every value except pre-rendered HTML |
+| `scripts/lib/seo.mjs` | schema.org JSON-LD: WebSite + Person (home), BlogPosting (posts), ProfilePage (about). Person.sameAs = `site.config.json` → `profiles` |
 | `scripts/lib/util.mjs` | escape, slugify (ASCII only), UTC date formatting, excerpt truncation |
 | `scripts/serve.mjs` | local server mimicking Pages (301 to trailing slash, 404.html with status 404) |
 | `scripts/new-post.mjs` | `npm run new -- "Title"` → today's draft |
@@ -65,6 +66,16 @@ Markup extras: footnotes `[^id]` + `[^id]: …` (strict: missing/unused/duplicat
 - Section headings get ids and link to themselves; links/footnotes inside headings are rejected by the build.
 - Footnotes, contents and the series box are muted, small, and use hairline rules, never an accent colour.
 - Reading time shows only for essays of 3+ minutes (230 wpm).
+
+## Search engines
+
+- Goal: the blog ranks for "Harsh Mangalam Verma" and for its essay topics. Identity = Person JSON-LD + `rel="me"` + name in home/About titles + reciprocal links from GitHub/LinkedIn.
+- Manual setup Harsh does once (cannot be automated from the repo):
+  1. Google Search Console → add *Domain* property `mangalams.blog` → add the TXT record at Hostinger DNS → verify → Sitemaps → submit `https://mangalams.blog/sitemap.xml` → URL inspection → request indexing for `/` and `/about/`.
+  2. Bing Webmaster Tools → import from Search Console (also feeds DuckDuckGo, Yahoo, ChatGPT search).
+  3. GitHub profile "Website" → `https://mangalams.blog`; LinkedIn → Contact info → Website + a Featured link.
+- Validate structured data after template changes: https://search.google.com/test/rich-results
+- Never put `noindex` on real pages; only drafts, redirects and 404 carry it.
 
 ## Known quirks
 

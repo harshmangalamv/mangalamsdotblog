@@ -5,5 +5,10 @@
   "description": "Essays by Harsh Mangalam Verma.",
   "language": "en",
   "pageSize": 10,
-  "feedSize": 20
+  "feedSize": 20,
+  "profiles": [
+    "https://github.com/harshmangalamv",
+    "https://www.linkedin.com/in/harshmangalamv/",
+    "https://leetcode.com/harshmangalamv/"
+  ]
 }

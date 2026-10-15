@@ -328,6 +328,38 @@ test("longer essays show reading time", async () => {
   assert.match(await read(root, "index.html"), /3 min read/);
 });
 
+test("search engines: name in titles, author links, valid structured data", async () => {
+  const root = await fixture({
+    "site.config.json": JSON.stringify({ title: "t.blog", url: "https://t.blog", author: "A Writer", description: "D", profiles: ["https://github.com/a"] }),
+    "posts_raw/01-01-2026-1.txt": "Title: One </script> two\n\nBody text here.",
+    "posts_raw/02-01-2026-1.txt": "Title: Draft\nStatus: draft\n\nWIP.",
+  });
+  await build({ root, log: () => {}, drafts: true });
+  const ld = (html) => JSON.parse(html.match(/<script type="application\/ld\+json">(.*?)<\/script>/)[1]);
+
+  const home = await read(root, "index.html");
+  assert.match(home, /<title>t\.blog · A Writer<\/title>/);
+  assert.match(home, /<link rel="me" href="https:\/\/github\.com\/a">/);
+  assert.match(home, /<meta name="author" content="A Writer">/);
+  const [site, person] = ld(home)["@graph"];
+  assert.equal(site["@type"], "WebSite");
+  assert.deepEqual([person["@type"], person.name, person.url, person.sameAs], ["Person", "A Writer", "https://t.blog/about/", ["https://github.com/a"]]);
+
+  const post = await read(root, "one-script-two/index.html");
+  assert.doesNotMatch(post, /<\/script> two/); // a title can never break out of the JSON block
+  const [article] = ld(post)["@graph"];
+  assert.equal(article["@type"], "BlogPosting");
+  assert.equal(article.headline, "One </script> two");
+  assert.equal(article.datePublished, "2026-01-01");
+  assert.equal(article.author.name, "A Writer");
+
+  const about = await read(root, "about/index.html");
+  assert.match(about, /<title>About · A Writer<\/title>/);
+  assert.equal(ld(about)["@graph"][0]["@type"], "ProfilePage");
+
+  assert.doesNotMatch(await read(root, "draft/index.html"), /application\/ld\+json/); // drafts carry no structured data
+});
+
 test("build fails loudly on a broken post", async () => {
   const root = await fixture({ "posts_raw/01-01-2026-1.txt": "Title: T\nDate: 2026-01-02\n\nB" });
   await assert.rejects(build({ root, log: () => {} }), /does not match the filename/);

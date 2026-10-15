@@ -2,6 +2,7 @@
 // already-rendered HTML (post bodies from markup.mjs, or other templates).
 
 import { escapeHtml as e, formatDateLong } from "./util.mjs";
+import { jsonLd } from "./seo.mjs";
 
 // The site's mark, shown beside the name. Empty for now: the logo is being designed.
 // To add it later, set this to an inline <svg class="mark" aria-hidden="true">…</svg>
@@ -21,6 +22,7 @@ export function layout(site, page) {
     current = null, // nav item to mark as current
     body,
     scripts = [],
+    structured = [], // schema.org items for this page (see seo.mjs)
   } = page;
 
   const url = path ? site.url + path : null;
@@ -43,6 +45,10 @@ export function layout(site, page) {
     url ? `<meta property="og:url" content="${e(url)}">` : "",
     date ? `<meta property="article:published_time" content="${e(date)}">` : "",
     `<meta name="twitter:card" content="summary">`,
+    `<meta name="author" content="${e(site.author)}">`,
+    // rel="me" tells search engines and the fediverse these profiles are the same person
+    ...(site.profiles || []).map((href) => `<link rel="me" href="${e(href)}">`),
+    jsonLd(structured),
   ]
     .filter(Boolean)
     .join("\n  ");
