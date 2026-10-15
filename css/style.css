@@ -136,13 +136,22 @@ main,
     padding-block: 2.25rem 3.5rem;
 }
 
+/* The wordmark: the first thing seen, but always smaller than an essay title
+   (titles are 2rem to 2.6rem and bold; the name is 1.375rem to 1.75rem and regular). */
 .site-name {
     display: inline-flex;
     align-items: baseline;
     gap: 0.45em;
     color: var(--ink);
-    font-size: 1.125rem;
+    font-size: clamp(1.375rem, 1.2rem + 0.75vw, 1.75rem);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
     text-decoration: none;
+}
+
+.site-name:hover {
+    color: var(--link);
 }
 
 .site-header ul {
