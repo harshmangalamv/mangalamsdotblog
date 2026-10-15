@@ -9,16 +9,16 @@
 :root {
     color-scheme: light dark;
 
-    /* Day: paper and ink */
-    --paper: #fdfcf9;
-    --ink: #1f1d1a;
-    --body: #2e2c28;
-    --muted: #6e6a62;
-    --rule: #e6e2d9;
-    --link: #34399a;
-    --link-line: #b9bbe0;
-    --selection: #f6dfb8;
-    --code-bg: #f3f1ec;
+    /* Day: Neel, a faint indigo wash (indigo: Champaran, Bihar, 1917) */
+    --paper: #eceaf3;
+    --ink: #1b1a2b;
+    --body: #2b2a3b;
+    --muted: #625f75;
+    --rule: #d6d3e3;
+    --link: #2f3592;
+    --link-line: #a9abd6;
+    --selection: #f3dfb6;
+    --code-bg: #e1deec;
 
     /* Type: the best reading serif each platform already has */
     --serif: Charter, "Bitstream Charter", "Sitka Text", "Iowan Old Style", Cambria, Georgia, serif;
@@ -30,16 +30,16 @@
 
 @media (prefers-color-scheme: dark) {
     :root {
-        /* Night: the lamp is lit */
-        --paper: #16171d;
-        --ink: #ece7dc;
-        --body: #d6d1c6;
-        --muted: #9b968b;
-        --rule: #2d2f38;
+        /* Night: deep indigo, links glow like lamplight */
+        --paper: #14142a;
+        --ink: #ebe8f5;
+        --body: #d3d0e2;
+        --muted: #9895b2;
+        --rule: #2b2a48;
         --link: #e9b765;
         --link-line: #6b5a3b;
         --selection: #4a3c22;
-        --code-bg: #20222a;
+        --code-bg: #1f1e3a;
     }
 }
 

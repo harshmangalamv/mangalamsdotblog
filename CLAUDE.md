@@ -59,7 +59,7 @@ Markup extras: footnotes `[^id]` + `[^id]: …` (strict: missing/unused/duplicat
 ## Design system ("ink by day, lamplight by night")
 
 - No logo yet (Harsh is designing one). `MARK` in templates.mjs is the empty slot beside the site name; `favicon.svg` is a placeholder "m". Essays end in plain space. Don't add decoration.
-- Day: paper `#fdfcf9`, ink `#1f1d1a`, links indigo `#34399a`. Night (automatic, follows the reader's OS/browser theme): `#16171d`, `#ece7dc`, links amber `#e9b765`.
+- Background "Neel" (pale indigo; a nod to Champaran's indigo and the 1917 satyagraha in Bihar). Day: paper `#eceaf3`, ink `#1b1a2b`, links indigo `#2f3592`. Night (automatic, follows the reader's OS/browser theme): paper `#14142a`, ink `#ebe8f5`, links amber `#e9b765`. All text/link/muted pairs pass WCAG AA.
 - Type: system serif stack (Charter / Sitka Text / Georgia...), no web fonts. Body 17→19px, line-height 1.65, ~65ch measure.
 - No all-caps labels, no `→` arrows, no cards or shadows. Structure comes from whitespace; hairline rules only where they separate the essay from navigation.
 - Section headings get ids and link to themselves; links/footnotes inside headings are rejected by the build.

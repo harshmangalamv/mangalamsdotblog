@@ -55,8 +55,8 @@ export function layout(site, page) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#fdfcf9" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#16171d" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#eceaf3" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#14142a" media="(prefers-color-scheme: dark)">
   <title>${e(title)}</title>
   ${meta}
   <link rel="alternate" type="application/atom+xml" title="${e(site.title)}" href="/feed.xml">
