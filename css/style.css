@@ -1,20 +1,55 @@
+/* mangalams.blog
+   Ink by day, lamplight by night. One reading column, one mark (the flame),
+   system serif type so nothing has to download before you can read. */
+
 /* =========================
-   BASE
+   TOKENS
 ========================= */
 
 :root {
-    --bg: #f7f5ef;
-    --paper: #fbfaf6;
-    --text: #1e1e1b;
-    --body: #37352f;
-    --preview: #3a372f;
-    --muted: #6f6a5f;
-    --rule: #ded8ca;
-    --quote-rule: #c6bfae;
-    --link: #222;
-    --link-underline: #b8b1a4;
-    --focus: #8a6d3b;
+    color-scheme: light dark;
+
+    /* Day: paper and ink */
+    --paper: #fdfcf9;
+    --ink: #1f1d1a;
+    --body: #2e2c28;
+    --muted: #6e6a62;
+    --rule: #e6e2d9;
+    --link: #34399a;
+    --link-line: #b9bbe0;
+    --flame: #df8f2a;
+    --flame-core: #f7cf6d;
+    --selection: #f6dfb8;
+    --code-bg: #f3f1ec;
+
+    /* Type: the best reading serif each platform already has */
+    --serif: Charter, "Bitstream Charter", "Sitka Text", "Iowan Old Style", Cambria, Georgia, serif;
+    --mono: ui-monospace, "Cascadia Mono", Consolas, "SF Mono", Menlo, monospace;
+    --text-size: clamp(1.0625rem, 0.98rem + 0.35vw, 1.1875rem); /* 17px phone -> 19px desktop */
+    --measure: 36rem;
+    --gutter: 1.25rem;
 }
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* Night: the lamp is lit */
+        --paper: #16171d;
+        --ink: #ece7dc;
+        --body: #d6d1c6;
+        --muted: #9b968b;
+        --rule: #2d2f38;
+        --link: #e9b765;
+        --link-line: #6b5a3b;
+        --flame: #f2b24f;
+        --flame-core: #fde7a6;
+        --selection: #4a3c22;
+        --code-bg: #20222a;
+    }
+}
+
+/* =========================
+   BASE
+========================= */
 
 *,
 *::before,
@@ -29,367 +64,475 @@ html {
 
 body {
     margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 19px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: var(--text-size);
+    line-height: 1.6;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
 }
 
+::selection {
+    background: var(--selection);
+}
+
+a {
+    color: var(--link);
+}
+
 a:focus-visible {
-    outline: 2px solid var(--focus);
+    outline: 2px solid var(--link);
     outline-offset: 3px;
     border-radius: 2px;
 }
 
-/* =========================
-   GRID LAYOUT
-   The window scrolls (not an inner pane), so Back/Forward, anchors,
-   find-in-page and mobile browsers all behave natively.
-========================= */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
 
-.layout {
-    display: grid;
-    grid-template-columns: 260px minmax(0, 1fr);
-    max-width: 1100px;
-    min-height: 100vh;
-    margin: 0 auto;
-    padding: 0 24px;
-    gap: 40px;
+.skip-link {
+    position: absolute;
+    left: var(--gutter);
+    top: -3rem;
+    padding: 0.4rem 0.8rem;
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 0.875rem;
+    text-decoration: none;
+    z-index: 1;
+}
+
+.skip-link:focus {
+    top: 0.75rem;
+}
+
+/* The flame mark */
+.flame {
+    display: inline-block;
+    width: auto;
+    height: 1.1em;
+    fill: var(--flame);
+    vertical-align: -0.15em;
+}
+
+.flame .flame-core {
+    fill: var(--flame-core);
 }
 
 /* =========================
-   SIDEBAR
+   FRAME: header, column, footer
 ========================= */
 
-.sidebar {
-    position: sticky;
-    top: 0;
-    align-self: start;
-    padding-top: 60px;
+.site-header,
+main,
+.site-footer {
+    max-width: calc(var(--measure) + 2 * var(--gutter));
+    margin-inline: auto;
+    padding-inline: var(--gutter);
 }
 
-.site-title {
-    font-size: 27px;
-    font-weight: normal;
-    margin: 0 0 32px 0;
-    letter-spacing: 0.2px;
+.site-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    padding-block: 2.25rem 3.5rem;
 }
 
-.site-title a {
+.site-name {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.45em;
+    color: var(--ink);
+    font-size: 1.125rem;
+    text-decoration: none;
+}
+
+.site-name .flame {
+    height: 1.05em;
+    align-self: center;
+}
+
+.site-header ul {
+    display: flex;
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.site-header nav a {
+    color: var(--muted);
+    font-size: 0.9375rem;
+    text-decoration: none;
+}
+
+.site-header nav a:hover,
+.site-header nav a[aria-current="page"] {
+    color: var(--ink);
+}
+
+.site-footer {
+    padding-block: 4.5rem 3rem;
+    color: var(--muted);
+    font-size: 0.875rem;
+}
+
+.site-footer p {
+    margin: 0;
+}
+
+.site-footer a {
+    color: inherit;
+    text-underline-offset: 0.2em;
+}
+
+.meta {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.875rem;
+}
+
+.reading-time {
+    margin-left: 0.9em;
+}
+
+.empty {
+    color: var(--muted);
+}
+
+/* =========================
+   HOME: the list of essays
+========================= */
+
+.preview + .preview {
+    margin-top: 2.75rem;
+}
+
+.preview h2 {
+    margin: 0 0 0.3rem 0;
+    font-size: 1.45rem;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+}
+
+.preview h2 a {
+    color: var(--ink);
+    text-decoration: none;
+}
+
+.preview h2 a:hover {
+    color: var(--link);
+}
+
+.preview .excerpt {
+    margin: 0.7rem 0 0 0;
+    color: var(--body);
+    text-wrap: pretty;
+}
+
+.feed-end {
+    margin: 3.5rem 0 0 0;
+    font-size: 0.9375rem;
+}
+
+/* =========================
+   ESSAY
+========================= */
+
+.post-header {
+    margin-bottom: 2.25rem;
+}
+
+.post-header h1 {
+    margin: 0 0 0.6rem 0;
+    font-size: clamp(2rem, 1.55rem + 2vw, 2.6rem);
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+}
+
+.prose {
+    color: var(--body);
+    line-height: 1.65;
+    overflow-wrap: break-word;
+}
+
+.prose > :first-child {
+    margin-top: 0;
+}
+
+.prose p,
+.prose ul,
+.prose ol,
+.prose blockquote,
+.prose figure {
+    margin: 0 0 1.15em 0;
+}
+
+.prose p {
+    text-wrap: pretty;
+}
+
+.prose a {
+    text-decoration-line: underline;
+    text-decoration-color: var(--link-line);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+}
+
+.prose a:hover {
+    text-decoration-color: currentColor;
+}
+
+.prose h2,
+.prose h3 {
+    margin: 2.2em 0 0.6em 0;
+    color: var(--ink);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    scroll-margin-top: 1.5rem;
+}
+
+.prose h2 {
+    font-size: 1.4rem;
+}
+
+.prose h3 {
+    font-size: 1.15rem;
+}
+
+/* Section headings link to themselves; a # appears on hover so readers can copy it. */
+.prose .anchor {
     color: inherit;
     text-decoration: none;
 }
 
-.menu ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.menu li {
-    margin: 0 0 12px 0;
-}
-
-.menu a {
-    text-decoration: none;
+.prose .anchor:hover::after,
+.prose .anchor:focus-visible::after {
+    content: "#";
+    margin-left: 0.35em;
     color: var(--muted);
-    font-size: 16px;
-    letter-spacing: 0.25px;
+    font-weight: 400;
 }
 
-.menu a:hover,
-.menu a[aria-current="page"] {
-    color: var(--text);
+.prose ul,
+.prose ol {
+    padding-left: 1.3em;
 }
 
-/* =========================
-   CONTENT AREA
-========================= */
-
-.content-pane {
-    min-width: 0;
+.prose li + li {
+    margin-top: 0.35em;
 }
 
-.content {
-    max-width: 600px;   /* tighter reading column */
-    line-height: 1.8;
-    letter-spacing: 0.1px;
-    margin-top: 52px;
-    padding: 0 0 64px 0;
-    overflow-wrap: break-word;
-}
-
-/* Titles */
-.content h1 {
-    font-size: 38px;
-    font-weight: normal;
-    line-height: 1.22;
-    margin: 0 0 14px 0;
-    letter-spacing: -0.25px;
-}
-
-/* Paragraph rhythm */
-.content p {
-    margin: 0 0 14px 0;
-}
-
-/* Links */
-.content a {
-    color: var(--link);
-    text-decoration: none;
-    text-decoration-color: var(--link-underline);
-    text-underline-offset: 3px;
-    text-decoration-thickness: 1px;
-}
-
-.content a:hover {
-    text-decoration: underline;
-    text-decoration-color: var(--muted);
-}
-
-/* Blog list date style */
-.blog-date {
+.prose li::marker {
     color: var(--muted);
-    margin-right: 8px;
-    font-size: 15px;
-    letter-spacing: 0.2px;
 }
 
-/* preview section */
-.blog-preview {
-    margin: 0;
-    padding: 0 0 22px 0;
-    border-bottom: 1px solid var(--rule);
-}
-
-.blog-preview + .blog-preview {
-    margin-top: 18px;
-}
-
-.blog-preview h2 {
-    font-size: 32px;
-    font-weight: normal;
-    line-height: 1.28;
-    margin: 0 0 6px 0;
-    letter-spacing: -0.2px;
-}
-
-.blog-preview p {
-    color: var(--preview);
-}
-
-.feed-end,
-.empty {
-    margin-top: 28px;
+.prose blockquote {
+    padding-left: 1.1em;
+    border-left: 2px solid var(--rule);
     color: var(--muted);
-    font-size: 16px;
 }
 
-/* single post page */
-.post {
-    max-width: 600px;
-    padding: 44px 0 72px 0;
-}
-
-.post-title {
-    font-size: 58px;
-    font-weight: 800;
-    line-height: 1.08;
-    letter-spacing: -0.6px;
-    margin: 0 0 12px 0;
-}
-
-.post-meta {
-    color: var(--muted);
-    font-size: 15px;
-    margin: 0 0 28px 0;
-    letter-spacing: 0.25px;
-}
-
-.post .post-body {
-    font-size: 20px;
-    line-height: 1.48;
-    color: var(--body);
-    letter-spacing: 0;
-}
-
-.post .post-body p {
-    margin: 0 0 18px 0;
-}
-
-/* Body links are underlined so they are visible inside prose. */
-.post .post-body a {
-    text-decoration: underline;
-}
-
-.post .post-body h2,
-.post .post-body h3 {
-    font-weight: normal;
-    line-height: 1.28;
-    margin: 30px 0 10px 0;
-    letter-spacing: -0.15px;
-}
-
-.post .post-body h2 {
-    font-size: 28px;
-}
-
-.post .post-body h3 {
-    font-size: 23px;
-}
-
-.post .post-body blockquote {
-    margin: 20px 0;
-    padding: 4px 0 4px 18px;
-    border-left: 2px solid var(--quote-rule);
-    color: var(--body);
-    font-style: italic;
-}
-
-.post .post-body blockquote p:last-child {
+.prose blockquote p:last-child {
     margin-bottom: 0;
 }
 
-.post .post-body ul,
-.post .post-body ol {
-    margin: 0 0 18px 0;
-    padding-left: 1.4em;
+.prose strong {
+    color: var(--ink);
 }
 
-.post .post-body li {
-    margin: 0 0 6px 0;
-}
-
-.post .post-body code {
-    font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
-    font-size: 0.85em;
-    background: var(--paper);
-    border: 1px solid var(--rule);
+.prose code {
+    padding: 0.1em 0.3em;
     border-radius: 3px;
-    padding: 0 4px;
+    background: var(--code-bg);
+    font-family: var(--mono);
+    font-size: 0.85em;
 }
 
-.post .post-body hr {
+.prose hr {
+    width: 4rem;
+    margin: 2.5em auto;
     border: 0;
     border-top: 1px solid var(--rule);
-    margin: 32px 0;
 }
 
-.post .post-body figure {
-    margin: 24px 0;
-}
-
-.post .post-body img {
+.prose img {
     display: block;
     max-width: 100%;
     height: auto;
+    border-radius: 2px;
 }
 
-.post .post-body figcaption {
+.prose figcaption {
+    margin-top: 0.6em;
     color: var(--muted);
-    font-size: 15px;
-    margin-top: 8px;
+    font-size: 0.875rem;
 }
 
-/* Older / newer links under a post */
+/* The flame closes every essay */
+.end-mark {
+    margin: 2.5rem 0 0 0;
+    text-align: center;
+}
+
+.end-mark .flame {
+    height: 1.25rem;
+}
+
 .post-nav {
-    display: flex;
-    justify-content: space-between;
-    gap: 24px;
-    max-width: 600px;
-    margin: -40px 0 64px 0;
-    padding-top: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 3.5rem;
+    padding-top: 1.5rem;
     border-top: 1px solid var(--rule);
-    font-size: 16px;
+}
+
+.post-nav a {
+    display: block;
+    text-decoration: none;
 }
 
 .post-nav .newer {
-    margin-left: auto;
+    grid-column: 2;
     text-align: right;
 }
 
-/* Archive */
-.archive-year h2 {
-    font-size: 24px;
-    font-weight: normal;
-    margin: 28px 0 8px 0;
+.post-nav .label {
+    display: block;
+    color: var(--muted);
+    font-size: 0.8125rem;
 }
 
-.archive-list {
-    list-style: none;
+.post-nav .title {
+    color: var(--ink);
+    line-height: 1.35;
+}
+
+.post-nav a:hover .title {
+    color: var(--link);
+}
+
+/* =========================
+   ARCHIVE
+========================= */
+
+.archive-year + .archive-year {
+    margin-top: 2.25rem;
+}
+
+.archive-year h2 {
+    margin: 0 0 0.75rem 0;
+    color: var(--muted);
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.archive-year ul {
     margin: 0;
     padding: 0;
+    list-style: none;
 }
 
-.archive-list li {
-    display: flex;
+.archive-year li {
+    display: grid;
+    grid-template-columns: 4.25rem 1fr;
     align-items: baseline;
-    gap: 12px;
-    margin: 0 0 6px 0;
+    gap: 0.75rem;
 }
 
-.archive-list time {
-    flex: 0 0 4.2em;
+.archive-year li + li {
+    margin-top: 0.55rem;
+}
+
+.archive-year time {
     color: var(--muted);
-    font-size: 15px;
+    font-size: 0.875rem;
+}
+
+.archive-year li a {
+    color: var(--ink);
+    text-decoration: none;
+}
+
+.archive-year li a:hover {
+    color: var(--link);
 }
 
 /* Local preview only */
 .draft-banner {
-    margin: 24px 0 0 0;
-    padding: 8px 12px;
+    margin: 0 0 2rem 0;
+    padding: 0.5rem 0.75rem;
     border: 1px dashed var(--muted);
     color: var(--muted);
-    font-size: 15px;
+    font-size: 0.875rem;
 }
 
-@media (max-width: 900px) {
-    .layout {
-        grid-template-columns: minmax(0, 1fr);
-        min-height: 0;
-        padding: 24px 16px;
-        gap: 24px;
+/* =========================
+   SMALL SCREENS
+========================= */
+
+@media (max-width: 480px) {
+    .site-header {
+        padding-block: 1.25rem 2.25rem;
     }
 
-    .sidebar {
-        position: static;
-        padding-top: 0;
+    .post-nav {
+        grid-template-columns: 1fr;
     }
 
-    .site-title {
-        margin-bottom: 12px;
+    .post-nav .newer {
+        grid-column: 1;
+        grid-row: 1;
+        text-align: left;
+    }
+}
+
+/* =========================
+   PRINT: essays are worth printing
+========================= */
+
+@media print {
+    :root {
+        --paper: #fff;
+        --ink: #000;
+        --body: #000;
+        --muted: #444;
+        --link: #000;
     }
 
-    .menu ul {
-        display: flex;
-        gap: 20px;
+    body {
+        font-size: 11pt;
     }
 
-    .menu li {
-        margin: 0;
+    .site-header nav,
+    .site-footer,
+    .post-nav,
+    .feed-end,
+    .skip-link {
+        display: none;
     }
 
-    .content {
-        margin-top: 0;
-        padding-bottom: 36px;
+    .site-header {
+        padding-block: 0 1.5rem;
     }
 
-    .post {
-        padding-top: 12px;
-    }
-
-    .blog-preview h2 {
-        font-size: 28px;
-    }
-
-    .post-title {
-        font-size: 42px;
-    }
-
-    .post .post-body {
-        font-size: 19px;
-        line-height: 1.44;
+    .prose a[href^="http"]::after {
+        content: " (" attr(href) ")";
+        font-size: 0.85em;
+        word-break: break-all;
     }
 }

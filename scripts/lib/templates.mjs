@@ -3,6 +3,12 @@
 
 import { escapeHtml as e, formatDateLong } from "./util.mjs";
 
+// The blog's one mark: a diya flame. Used beside the name, at the end of each
+// essay, and as the favicon. Colours come from CSS (currentColor + --flame-core).
+export const FLAME = `<svg class="flame" viewBox="0 0 16 22" aria-hidden="true" focusable="false"><path d="M8 1C8 1 2 8.6 2 13.6a6 6 0 0 0 12 0C14 8.6 8 1 8 1Z"/><path class="flame-core" d="M8 9.5C8 9.5 5.2 13 5.2 15.2a2.8 2.8 0 0 0 5.6 0C10.8 13 8 9.5 8 9.5Z"/></svg>`;
+
+const readingTime = (post) => (post.minutes >= 3 ? ` <span class="reading-time">${post.minutes} min read</span>` : "");
+
 export function layout(site, page) {
   const {
     title, // full <title>
@@ -11,7 +17,6 @@ export function layout(site, page) {
     type = "website",
     date = null,
     noindex = false,
-    isHome = false,
     current = null, // nav item to mark as current
     body,
     scripts = [],
@@ -19,15 +24,12 @@ export function layout(site, page) {
 
   const url = path ? site.url + path : null;
   const nav = site.nav
+    .filter((item) => item.key !== "home") // the name already links home
     .map((item) => {
       const aria = item.key === current ? ' aria-current="page"' : "";
       return `<li><a href="${e(item.href)}"${aria}>${e(item.label)}</a></li>`;
     })
     .join("");
-
-  const siteTitle = isHome
-    ? `<h1 class="site-title"><a href="/">${e(site.title)}</a></h1>`
-    : `<p class="site-title"><a href="/">${e(site.title)}</a></p>`;
 
   const meta = [
     `<meta name="description" content="${e(description)}">`,
@@ -44,11 +46,16 @@ export function layout(site, page) {
     .filter(Boolean)
     .join("\n  ");
 
+  const homeAria = current === "home" ? ' aria-current="page"' : "";
+
   return `<!DOCTYPE html>
 <html lang="${e(site.language)}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#fdfcf9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#16171d" media="(prefers-color-scheme: dark)">
   <title>${e(title)}</title>
   ${meta}
   <link rel="alternate" type="application/atom+xml" title="${e(site.title)}" href="/feed.xml">
@@ -56,17 +63,17 @@ export function layout(site, page) {
   <link rel="stylesheet" href="${e(site.assets.css)}">
 </head>
 <body>
-  <div class="layout">
-    <aside class="sidebar">
-      ${siteTitle}
-      <nav class="menu" aria-label="Site"><ul>${nav}</ul></nav>
-    </aside>
-    <main class="content-pane">
-      <div class="content">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="site-name" href="/"${homeAria}>${FLAME}<span>${e(site.title)}</span></a>
+    <nav aria-label="Site"><ul>${nav}</ul></nav>
+  </header>
+  <main id="main">
 ${body}
-      </div>
-    </main>
-  </div>
+  </main>
+  <footer class="site-footer">
+    <p>Written by ${e(site.author)}. <a href="/feed.xml">Subscribe with RSS</a></p>
+  </footer>
 ${scripts.map((src) => `  <script type="module" src="${e(src)}"></script>`).join("\n")}
 </body>
 </html>
@@ -74,41 +81,47 @@ ${scripts.map((src) => `  <script type="module" src="${e(src)}"></script>`).join
 }
 
 export function preview(post) {
-  return `<article class="blog-preview">
+  return `<article class="preview">
   <h2><a href="/${e(post.slug)}/">${e(post.title)}</a></h2>
-  <p class="blog-date"><time datetime="${e(post.date)}">${e(formatDateLong(post.date))}</time></p>
-  <p>${e(post.excerpt)}</p>
+  <p class="meta"><time datetime="${e(post.date)}">${e(formatDateLong(post.date))}</time>${readingTime(post)}</p>
+  <p class="excerpt">${e(post.excerpt)}</p>
 </article>`;
 }
 
 export function postBody(post, { older, newer }) {
-  const draft = post.draft ? `<p class="draft-banner">Draft — not published. Only visible in local preview.</p>\n` : "";
-  const links = [
-    older ? `<a class="older" rel="prev" href="/${e(older.slug)}/">← ${e(older.title)}</a>` : "",
-    newer ? `<a class="newer" rel="next" href="/${e(newer.slug)}/">${e(newer.title)} →</a>` : "",
-  ].join("");
-  const nav = links ? `\n<nav class="post-nav" aria-label="More posts">${links}</nav>` : "";
+  const draft = post.draft ? `<p class="draft-banner">Draft. Only visible in local preview.</p>\n` : "";
+  const cell = (p, cls, label, rel) =>
+    p
+      ? `<a class="${cls}" rel="${rel}" href="/${e(p.slug)}/"><span class="label">${label}</span><span class="title">${e(p.title)}</span></a>`
+      : "";
+  const links = cell(older, "older", "Older", "prev") + cell(newer, "newer", "Newer", "next");
+  const nav = links ? `\n<nav class="post-nav" aria-label="More essays">${links}</nav>` : "";
 
   return `${draft}<article class="post">
-  <h1 class="post-title">${e(post.title)}</h1>
-  <p class="post-meta"><time datetime="${e(post.date)}">${e(formatDateLong(post.date))}</time></p>
-  <div class="post-body">
+  <header class="post-header">
+    <h1>${e(post.title)}</h1>
+    <p class="meta"><time datetime="${e(post.date)}">${e(formatDateLong(post.date))}</time>${readingTime(post)}</p>
+  </header>
+  <div class="prose">
 ${post.content}
   </div>
+  <p class="end-mark">${FLAME}</p>
 </article>${nav}`;
 }
 
-export function homeBody(firstPageHtml, feed) {
-  if (!firstPageHtml) return `<p class="empty">Nothing published yet.</p>`;
+export function homeBody(firstPageHtml, feed, site) {
+  if (!firstPageHtml) return `<p class="empty">The first essay is on its way.</p>`;
   const attrs = feed.pages > 1 ? ` data-pages="${feed.pages}" data-prefix="${e(feed.prefix)}" data-key="${e(feed.key)}"` : "";
-  return `<div id="feed"${attrs}>
+  return `<h1 class="visually-hidden">${e(site.title)}</h1>
+<div id="feed" class="feed"${attrs}>
 ${firstPageHtml}
 </div>
-<p class="feed-end"><a href="/archive/">All posts →</a></p>`;
+<p class="feed-end"><a href="/archive/">Every essay, by year</a></p>`;
 }
 
 export function archiveBody(posts) {
-  if (!posts.length) return `<article class="post"><h1 class="post-title">Archive</h1><p>Nothing published yet.</p></article>`;
+  const heading = `<header class="post-header"><h1>Archive</h1><p class="meta">${posts.length} ${posts.length === 1 ? "essay" : "essays"}</p></header>`;
+  if (!posts.length) return `<article class="post">${heading}<p class="empty">Nothing published yet.</p></article>`;
   const years = new Map();
   for (const p of posts) {
     const y = p.date.slice(0, 4);
@@ -120,27 +133,27 @@ export function archiveBody(posts) {
       const items = list
         .map((p) => {
           const short = new Date(`${p.date}T00:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
-          return `<li><time datetime="${e(p.date)}">${e(short)}</time> <a href="/${e(p.slug)}/">${e(p.title)}</a></li>`;
+          return `<li><time datetime="${e(p.date)}">${e(short)}</time><a href="/${e(p.slug)}/">${e(p.title)}</a></li>`;
         })
         .join("\n      ");
-      return `  <section class="archive-year">
-    <h2>${e(year)}</h2>
-    <ul class="archive-list">
+      return `  <section class="archive-year" aria-labelledby="y${e(year)}">
+    <h2 id="y${e(year)}">${e(year)}</h2>
+    <ul>
       ${items}
     </ul>
   </section>`;
     })
     .join("\n");
   return `<article class="post archive">
-  <h1 class="post-title">Archive</h1>
+  ${heading}
 ${sections}
 </article>`;
 }
 
 export function pageBody(page) {
   return `<article class="post">
-  <h1 class="post-title">${e(page.title)}</h1>
-  <div class="post-body">
+  <header class="post-header"><h1>${e(page.title)}</h1></header>
+  <div class="prose">
 ${page.content}
   </div>
 </article>`;
@@ -148,9 +161,10 @@ ${page.content}
 
 export function notFoundBody() {
   return `<article class="post">
-  <h1 class="post-title">Not found</h1>
-  <div class="post-body">
-    <p>There is nothing at this address. Try the <a href="/">home page</a> or the <a href="/archive/">archive</a>.</p>
+  <header class="post-header"><h1>Page not found</h1></header>
+  <div class="prose">
+    <p>Nothing lives at this address. It may have been mistyped, or the essay may have been taken down.</p>
+    <p>Start from the <a href="/">latest essays</a> or browse the <a href="/archive/">archive</a>.</p>
   </div>
 </article>`;
 }

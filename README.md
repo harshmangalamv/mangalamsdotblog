@@ -32,7 +32,7 @@ Second paragraph.
 |---|---|
 | a blank line | new paragraph |
 | `\` at the end of a line | line break (poetry) |
-| `## Heading` / `### Subheading` | headings |
+| `## Heading` / `### Subheading` | headings (each one is linkable: `/post/#heading-text`; no links inside headings) |
 | `> quoted text` | block quote |
 | `- item` or `1. item` | lists (leave a blank line before) |
 | `[text](https://example.com)` | link (`https://`, `mailto:` or `/site-path` only) |

@@ -5,6 +5,8 @@
 //   plain lines           -> <p> (single line breaks become spaces)
 //   line ending in "\"    -> hard line break inside a paragraph (poetry)
 //   # / ## Heading        -> <h2>      ### Heading -> <h3>
+//                            (each heading gets an id and links to itself, so
+//                             readers can share a link to one section)
 //   > quoted lines        -> <blockquote>
 //   - item / * item       -> <ul>      1. item -> <ol>
 //   ---                   -> <hr>
@@ -12,7 +14,7 @@
 // Inline:
 //   [text](https://...)  **bold**  *italic*  `code`  \* (literal star)
 
-import { escapeHtml } from "./util.mjs";
+import { escapeHtml, slugify, htmlToText } from "./util.mjs";
 
 export class MarkupError extends Error {}
 
@@ -93,13 +95,13 @@ export function renderInline(raw, { allowLinks = true } = {}) {
 }
 
 // Joins the lines of one block: "\" at line end = hard break, else a space.
-function joinLines(lines) {
+function joinLines(lines, inline = {}) {
   let html = "";
   lines.forEach((line, idx) => {
     const isLast = idx === lines.length - 1;
     const hardBreak = !isLast && /\\\s*$/.test(line);
     const content = hardBreak ? line.replace(/\\\s*$/, "") : line;
-    html += renderInline(content.replace(/[\t ]+/g, " ").trim());
+    html += renderInline(content.replace(/[\t ]+/g, " ").trim(), inline);
     if (!isLast) html += hardBreak ? "<br>\n" : " ";
   });
   return html;
@@ -117,7 +119,7 @@ function renderList(lines, marker, tag) {
   return `<${tag}>${items.map((it) => `<li>${joinLines(it)}</li>`).join("")}</${tag}>`;
 }
 
-function renderBlock(lines) {
+function renderBlock(lines, ids) {
   const first = lines[0];
 
   if (lines.length === 1 && /^(-{3,}|\*{3,})$/.test(first)) return "<hr>";
@@ -126,7 +128,16 @@ function renderBlock(lines) {
   if (heading) {
     const tag = heading[1].length === 3 ? "h3" : "h2";
     const rest = [heading[2], ...lines.slice(1)];
-    return `<${tag}>${joinLines(rest)}</${tag}>`;
+    // The heading itself is the link to its section, so it cannot hold other links.
+    const inner = joinLines(rest);
+    if (/<a |<img /.test(inner)) {
+      throw new MarkupError(`Headings cannot contain links or images: "${first}". Put the link in the paragraph below.`);
+    }
+    const base = slugify(htmlToText(inner)) || "section";
+    let id = base;
+    for (let n = 2; ids.has(id); n += 1) id = `${base}-${n}`;
+    ids.add(id);
+    return `<${tag} id="${id}"><a class="anchor" href="#${id}">${inner}</a></${tag}>`;
   }
 
   if (lines.every((l) => /^>/.test(l))) {
@@ -171,5 +182,6 @@ export function renderBody(raw) {
     }
   }
   if (cur.length) blocks.push(cur);
-  return blocks.map(renderBlock).join("\n");
+  const ids = new Set(); // heading ids are unique within one post
+  return blocks.map((b) => renderBlock(b, ids)).join("\n");
 }

@@ -68,6 +68,14 @@ export function truncateWords(text, max) {
   return `${base.replace(/[\s.,;:!?-]+$/, "")}…`;
 }
 
+// Block boundaries become spaces; inline tags (<a>, <em>, <code>...) vanish
+// without leaving a gap, so "a <a>link</a>, then" stays "a link, then".
 export function htmlToText(html) {
-  return decodeBasicEntities(String(html).replace(/<[^>]*>/g, " ")).replace(/\s+/g, " ").trim();
+  return decodeBasicEntities(
+    String(html)
+      .replace(/<(br|hr)\b[^>]*>|<\/(p|h[1-6]|li|blockquote|figure|figcaption|ul|ol)>/gi, " ")
+      .replace(/<[^>]*>/g, "")
+  )
+    .replace(/\s+/g, " ")
+    .trim();
 }

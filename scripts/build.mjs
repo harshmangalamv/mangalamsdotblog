@@ -77,6 +77,7 @@ export async function build({ root = process.cwd(), outDir = path.join(root, "di
   );
   for (const p of posts) {
     p.excerpt = p.description || truncateWords(p.text, 280);
+    p.minutes = Math.max(1, Math.round(p.text.split(/\s+/).filter(Boolean).length / 230));
     p.atomId = `tag:${new URL(site.url).hostname},${p.date}:${p.id}`;
   }
 
@@ -145,9 +146,8 @@ export async function build({ root = process.cwd(), outDir = path.join(root, "di
       title: site.title,
       description: site.description,
       path: "/",
-      isHome: true,
       current: "home",
-      body: t.homeBody(previews.slice(0, site.pageSize).join("\n"), { pages: pageCount, prefix, key: feedKey }),
+      body: t.homeBody(previews.slice(0, site.pageSize).join("\n"), { pages: pageCount, prefix, key: feedKey }, site),
       scripts: pageCount > 1 ? [site.assets.feedJs] : [],
     })
   );
@@ -180,7 +180,7 @@ export async function build({ root = process.cwd(), outDir = path.join(root, "di
   await writeFile(
     resolvedOut,
     "404.html",
-    t.layout(site, { title: `Not found · ${site.title}`, description: site.description, path: null, noindex: true, body: t.notFoundBody() })
+    t.layout(site, { title: `Page not found · ${site.title}`, description: site.description, path: null, noindex: true, body: t.notFoundBody() })
   );
 
   // Feed, sitemap, robots (published posts only)

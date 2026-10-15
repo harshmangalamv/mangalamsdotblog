@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import { renderBody, renderInline } from "../scripts/lib/markup.mjs";
 import { parsePost, ContentError } from "../scripts/lib/content.mjs";
 import { assignSlugs, SlugError } from "../scripts/lib/slugs.mjs";
-import { slugify, formatDateLong, truncateWords } from "../scripts/lib/util.mjs";
+import { slugify, formatDateLong, truncateWords, htmlToText } from "../scripts/lib/util.mjs";
 import { build } from "../scripts/build.mjs";
 
 const post = (text, file = "05-09-2026-1.txt") => parsePost(text, file);
@@ -66,7 +66,7 @@ test("blocks: headings, quotes, lists, rule, figure, hard breaks", () => {
   assert.equal(
     html,
     [
-      "<h2>Why</h2>",
+      '<h2 id="why"><a class="anchor" href="#why">Why</a></h2>',
       "<blockquote><p>quoted line continues</p></blockquote>",
       "<ul><li>one wrapped</li><li>two</li></ul>",
       "<ol><li>first</li><li>second</li></ol>",
@@ -75,6 +75,18 @@ test("blocks: headings, quotes, lists, rule, figure, hard breaks", () => {
       "<p>roses are red<br>\nviolets are blue</p>",
     ].join("\n")
   );
+});
+
+test("headings get unique, linkable ids and cannot hold links", () => {
+  assert.equal(
+    renderBody("## Why *Bihar*?\n\n### Why Bihar?\n\n## बिहार"),
+    [
+      '<h2 id="why-bihar"><a class="anchor" href="#why-bihar">Why <em>Bihar</em>?</a></h2>',
+      '<h3 id="why-bihar-2"><a class="anchor" href="#why-bihar-2">Why Bihar?</a></h3>',
+      '<h2 id="section"><a class="anchor" href="#section">बिहार</a></h2>',
+    ].join("\n")
+  );
+  assert.throws(() => renderBody("## See [this](https://a.b)"), /Headings cannot contain links/);
 });
 
 test("inline dashes and colons do not become structure", () => {
@@ -158,6 +170,11 @@ test("dates never shift with timezone", () => {
   assert.equal(formatDateLong("2026-02-22"), "February 22, 2026");
 });
 
+test("plain text from HTML keeps punctuation tight and blocks apart", () => {
+  assert.equal(htmlToText(renderBody("A [link](https://a.b), **bold** and `code`.\n\nNext &amp; last.")), "A link, bold and code. Next &amp; last.");
+  assert.equal(htmlToText("<h2>One</h2><p>Two<br>three</p><ul><li>a</li><li>b</li></ul>"), "One Two three a b");
+});
+
 test("excerpts cut at a word boundary", () => {
   assert.equal(truncateWords("aaa bbb ccc ddd", 9), "aaa bbb…");
   assert.equal(truncateWords("short", 9), "short");
@@ -207,12 +224,16 @@ test("full build: pages, feed, drafts, redirects, unpublishing", async () => {
 
   // post pages, escaped titles, canonical, prev/next
   const one = await read(root, "old-one/index.html");
-  assert.match(one, /<h1 class="post-title">Old &lt;one&gt;<\/h1>/);
+  assert.match(one, /<h1>Old &lt;one&gt;<\/h1>/);
+  assert.match(one, /class="end-mark"><svg class="flame"/);
+  assert.match(one, /<a href="\/feed\.xml">Subscribe with RSS<\/a>/);
+  assert.match(one, /<a class="skip-link" href="#main">/);
+  assert.doesNotMatch(one, /min read/); // short essays show no reading time
   assert.match(one, /<title>Old &lt;one&gt; · t\.blog<\/title>/);
   assert.match(one, /<link rel="canonical" href="https:\/\/t\.blog\/old-one\/">/);
   assert.match(one, /<meta name="viewport"/);
   assert.match(one, /<time datetime="2026-01-01">January 1, 2026<\/time>/);
-  assert.match(one, /rel="next" href="\/second\/"/);
+  assert.match(one, /rel="next" href="\/second\/"><span class="label">Newer<\/span><span class="title">Two<\/span>/);
   assert.match(await read(root, "second/index.html"), /<a href="\/old-one\/">one<\/a>/);
 
   // old slug redirects; deleted and draft posts are not published
@@ -229,7 +250,8 @@ test("full build: pages, feed, drafts, redirects, unpublishing", async () => {
   assert.match(JSON.parse(await read(root, `data/${page2}`)).items[0], /\/old-one\//);
 
   // archive, about, 404, feed, sitemap, robots, CNAME
-  assert.match(await read(root, "archive/index.html"), /Jan 1<\/time> <a href="\/old-one\/">/);
+  assert.match(await read(root, "archive/index.html"), /Jan 1<\/time><a href="\/old-one\/">/);
+  assert.match(await read(root, "archive/index.html"), /3 essays/);
   assert.match(await read(root, "about/index.html"), /<p>Hi\.<\/p>/);
   assert.match(await read(root, "404.html"), /noindex/);
   const feed = await read(root, "feed.xml");
@@ -248,6 +270,14 @@ test("full build: pages, feed, drafts, redirects, unpublishing", async () => {
   await build({ root, log, drafts: true });
   assert.match(await read(root, "draft/index.html"), /draft-banner/);
   assert.equal(JSON.parse(await fs.readFile(path.join(root, "slugs.json"), "utf8"))["04-01-2026-1"], undefined);
+});
+
+test("longer essays show reading time", async () => {
+  const words = Array.from({ length: 700 }, (_, i) => `word${i}`).join(" ");
+  const root = await fixture({ "posts_raw/01-01-2026-1.txt": `Title: Long\n\n${words}` });
+  await build({ root, log: () => {} });
+  assert.match(await read(root, "long/index.html"), /<span class="reading-time">3 min read<\/span>/);
+  assert.match(await read(root, "index.html"), /3 min read/);
 });
 
 test("build fails loudly on a broken post", async () => {

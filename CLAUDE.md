@@ -37,7 +37,7 @@ Every page is complete HTML, so it works with JS disabled. The only JS is `src/f
 | `scripts/new-post.mjs` | `npm run new -- "Title"` → today's draft |
 | `test/build.test.mjs` | node:test: markup, parser, slugs, dates, an end-to-end fixture build, and a build of the real repo |
 | `.github/workflows/deploy.yml` | push to master → test → build → commit slugs.json if new → upload → deploy |
-| `css/style.css` | one stylesheet. The window scrolls; the sidebar is sticky on desktop and stacks on ≤900px |
+| `css/style.css` | one stylesheet, token-based (`:root` vars; dark values under `prefers-color-scheme`). One centred reading column (`--measure` 36rem), header + footer, print styles |
 
 ## Post format
 
@@ -55,15 +55,23 @@ Body syntax: README.md › Formatting.
 6. **Stay dependency-free and static.** Prefer build-time work over runtime JS.
 7. Reserved top-level names: archive, assets, css, data, js, feed, rss, atom, page, tag, tags, search, 404, index, plus every `pages_raw` name.
 
+## Design system ("ink by day, lamplight by night")
+
+- One mark: the diya flame (`FLAME` in templates.mjs, `favicon.svg`): beside the name, as the end-of-essay mark, as the favicon. Don't add other decoration.
+- Day: paper `#fdfcf9`, ink `#1f1d1a`, links indigo `#34399a`, flame `#df8f2a`. Night (automatic): `#16171d`, `#ece7dc`, links amber `#e9b765`.
+- Type: system serif stack (Charter / Sitka Text / Georgia...), no web fonts. Body 17→19px, line-height 1.65, ~65ch measure.
+- No all-caps labels, no `→` arrows, no cards or shadows. Structure comes from whitespace; hairline rules only where they separate the essay from navigation.
+- Section headings get ids and link to themselves; links inside headings are rejected by the build.
+- Reading time shows only for essays of 3+ minutes (230 wpm).
+
 ## Known quirks
 
-- `.post-title` declares 58px/800, but `.content h1` has higher specificity, so titles render at 38px normal. This is how the live site has always looked; change it deliberately if wanted.
 - If CI assigns a URL (a post pushed without a local build), it commits `slugs.json`. Run `git pull` before the next push.
 
-## Status (2026-10-15)
+## Status (2026-10-16)
 
-- Published: `22-02-2026-2` "Ail Ail Aimshh" → `/ail-ail-aimshh/`.
-- Local and uncommitted: `posts_raw/05-09-2026-1.txt` "the flickering lamp". It will publish on the next push unless it gets `Status: draft`.
+- Published: "Ail Ail Aimshh" → `/ail-ail-aimshh/`, "the flickering lamp" → `/the-flickering-lamp/`.
+- Branch `ux_refresh`: the design system above, awaiting review before merging to master.
 - Planned: a fact-backed series on why Bihar remains poor. Links (`[text](https://…)`) are supported for citations.
 - Remaining ideas: REVIEW.md.
 
