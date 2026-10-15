@@ -79,6 +79,8 @@ export async function build({ root = process.cwd(), outDir = path.join(root, "di
     p.excerpt = p.description || truncateWords(p.text, 280);
     p.minutes = Math.max(1, Math.round(p.text.split(/\s+/).filter(Boolean).length / 230));
     p.atomId = `tag:${new URL(site.url).hostname},${p.date}:${p.id}`;
+    // Feed readers resolve "#notes" against the site root, so point fragments at the post.
+    p.feedContent = p.content.replace(/href="#/g, `href="${site.url}/${p.slug}/#`);
   }
 
   // ---- output ----------------------------------------------------------
@@ -113,6 +115,25 @@ export async function build({ root = process.cwd(), outDir = path.join(root, "di
     post.newer = posts[i - 1] || null;
     post.older = posts[i + 1] || null;
   });
+
+  // Series: posts sharing a "Series:" name, oldest first = part 1.
+  const series = new Map();
+  for (const post of [...posts].reverse()) {
+    if (!post.series) continue;
+    if (!series.has(post.series)) series.set(post.series, []);
+    series.get(post.series).push(post);
+  }
+  for (const post of posts) {
+    if (!post.series) continue;
+    const parts = series.get(post.series);
+    post.seriesInfo = { name: post.series, parts, index: parts.indexOf(post) };
+  }
+
+  // Contents list for long essays: 4 or more top-level sections.
+  for (const post of posts) {
+    const sections = [...post.content.matchAll(/<h2 id="([^"]+)"><a class="anchor" href="#[^"]+">(.*?)<\/a><\/h2>/g)].map((m) => ({ id: m[1], html: m[2] }));
+    post.toc = sections.length >= 4 ? sections : [];
+  }
   for (const post of posts) {
     const html = t.layout(site, {
       title: `${post.title} · ${site.title}`,

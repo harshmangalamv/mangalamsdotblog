@@ -42,8 +42,9 @@ Every page is complete HTML, so it works with JS disabled. The only JS is `src/f
 ## Post format
 
 Filename `dd-mm-yyyy-N.txt`. The filename date is the source of truth. Header lines `Key: value` run until the first blank line or the first line that is not a `Key:` line.
-Keys: `Title` (required), `Date` (optional, must equal the filename date), `Status` (`published`|`draft`), `Slug`, `Description`. Unknown keys fail the build.
-Body syntax: README.md › Formatting.
+Keys: `Title` (required), `Date` (optional, must equal the filename date), `Status` (`published`|`draft`), `Slug`, `Description`, `Series`. Unknown keys fail the build.
+Body syntax: README.md › Formatting. Writer-facing guide: WRITING.md. Live example of every feature: `posts_raw/16-10-2026-1.txt` (a draft; never published).
+Markup extras: footnotes `[^id]` + `[^id]: …` (strict: missing/unused/duplicate fail), pipe tables (strict cell counts), `<!-- comments -->` stripped. Series = posts sharing a `Series:` name, ordered by date. Contents list when a post has ≥4 `##`. Page-owned ids (main, notes, series, toc-label, …) are reserved from heading ids.
 
 ## Invariants (do not break)
 
@@ -61,7 +62,8 @@ Body syntax: README.md › Formatting.
 - Day: paper `#fdfcf9`, ink `#1f1d1a`, links indigo `#34399a`, flame `#df8f2a`. Night (automatic): `#16171d`, `#ece7dc`, links amber `#e9b765`.
 - Type: system serif stack (Charter / Sitka Text / Georgia...), no web fonts. Body 17→19px, line-height 1.65, ~65ch measure.
 - No all-caps labels, no `→` arrows, no cards or shadows. Structure comes from whitespace; hairline rules only where they separate the essay from navigation.
-- Section headings get ids and link to themselves; links inside headings are rejected by the build.
+- Section headings get ids and link to themselves; links/footnotes inside headings are rejected by the build.
+- Footnotes, contents and the series box are muted, small, and use hairline rules, never the flame colour.
 - Reading time shows only for essays of 3+ minutes (230 wpm).
 
 ## Known quirks

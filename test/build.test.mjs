@@ -89,6 +89,34 @@ test("headings get unique, linkable ids and cannot hold links", () => {
   assert.throws(() => renderBody("## See [this](https://a.b)"), /Headings cannot contain links/);
 });
 
+test("footnotes: numbered by first use, repeat refs, notes section, strict errors", () => {
+  const html = renderBody("A.[^src] B.[^two] C.[^src]\n\n[^src]: [Census](https://census.gov.in), provisional.\n[^two]: Second note\ncontinues.");
+  assert.match(html, /<sup class="fn-ref" id="fnref-src"><a href="#fn-src"[^>]*>1<\/a><\/sup>/);
+  assert.match(html, /<sup class="fn-ref" id="fnref-two"><a href="#fn-two"[^>]*>2<\/a><\/sup>/);
+  assert.match(html, /<sup class="fn-ref" id="fnref-src-2"><a href="#fn-src"[^>]*>1<\/a><\/sup>/);
+  assert.match(html, /<li id="fn-src"><a href="https:\/\/census\.gov\.in" rel="noopener">Census<\/a>, provisional\. <a class="fn-back" href="#fnref-src"/);
+  assert.match(html, /<li id="fn-two">Second note continues\./);
+  assert.throws(() => renderBody("x[^nope]"), /used but never defined/);
+  assert.throws(() => renderBody("x\n\n[^a]: unused"), /defined but never used/);
+  assert.throws(() => renderBody("x[^a]\n\n[^a]: one\n[^a]: two"), /defined twice/);
+  assert.equal(htmlToText(html).startsWith("A. B. C."), true); // excerpts skip the markers
+});
+
+test("tables: header, alignment, inline formatting, escaped pipes, strict shape", () => {
+  assert.equal(
+    renderBody("| State | Literacy |\n|---|--:|\n| **Bihar** | 63.82% |\n| a \\| b | 1 |"),
+    '<div class="table-wrap"><table><thead><tr><th scope="col">State</th><th scope="col" class="align-right">Literacy</th></tr></thead>' +
+      '<tbody><tr><td><strong>Bihar</strong></td><td class="align-right">63.82%</td></tr><tr><td>a | b</td><td class="align-right">1</td></tr></tbody></table></div>'
+  );
+  assert.throws(() => renderBody("| a | b |\n|---|---|\n| 1 |"), /Table row 1 has 1 cells/);
+  assert.equal(renderBody("| not a table"), "<p>| not a table</p>");
+});
+
+test("comments never reach the page", () => {
+  assert.equal(renderBody("<!-- todo:\ncheck this -->\nKept <!-- hidden --> text."), "<p>Kept text.</p>");
+  assert.throws(() => renderBody("oops <!-- never closed"), /not closed/);
+});
+
 test("inline dashes and colons do not become structure", () => {
   assert.equal(renderBody("knowledge equalizers - far better: yes"), "<p>knowledge equalizers - far better: yes</p>");
 });
@@ -270,6 +298,26 @@ test("full build: pages, feed, drafts, redirects, unpublishing", async () => {
   await build({ root, log, drafts: true });
   assert.match(await read(root, "draft/index.html"), /draft-banner/);
   assert.equal(JSON.parse(await fs.readFile(path.join(root, "slugs.json"), "utf8"))["04-01-2026-1"], undefined);
+});
+
+test("series and contents", async () => {
+  const sections = ["One", "Two", "Three", "Four"].map((h) => `## ${h}\n\nText.`).join("\n\n");
+  const root = await fixture({
+    "posts_raw/01-01-2026-1.txt": "Title: Part A\nSeries: Why Bihar\n\nFirst.",
+    "posts_raw/02-01-2026-1.txt": `Title: Part B\nSeries: Why Bihar\n\n${sections}\n\nSee [notes](#notes).[^x]\n\n[^x]: A note.`,
+    "posts_raw/03-01-2026-1.txt": "Title: Unrelated\n\n## Only\n\nOne section.",
+  });
+  await build({ root, log: () => {} });
+  const b = await read(root, "part-b/index.html");
+  assert.match(b, /Part 2 of 2 in <a href="#series">Why Bihar<\/a>/);
+  assert.match(b, /<li><a href="\/part-a\/">Part A<\/a><\/li><li><span aria-current="page">Part B<\/span><\/li>/);
+  assert.match(b, /<nav class="toc"[^>]*><h2 id="toc-label">Contents<\/h2><ol><li><a href="#one">One<\/a><\/li>/);
+  assert.match(await read(root, "part-a/index.html"), /Part 1 of 2/);
+  assert.doesNotMatch(await read(root, "part-a/index.html"), /class="toc"/); // short essays get no contents
+  const unrelated = await read(root, "unrelated/index.html");
+  assert.doesNotMatch(unrelated, /series-note|class="toc"/);
+  // feed readers get absolute links for in-page anchors
+  assert.match(await read(root, "feed.xml"), /href=&quot;https:\/\/t\.blog\/part-b\/#notes&quot;/);
 });
 
 test("longer essays show reading time", async () => {

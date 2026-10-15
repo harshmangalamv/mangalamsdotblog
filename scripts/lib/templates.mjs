@@ -88,6 +88,31 @@ export function preview(post) {
 </article>`;
 }
 
+function seriesNote(post) {
+  const s = post.seriesInfo;
+  if (!s) return "";
+  return `\n    <p class="series-note">Part ${s.index + 1} of ${s.parts.length} in <a href="#series">${e(s.name)}</a></p>`;
+}
+
+function seriesNav(post) {
+  const s = post.seriesInfo;
+  if (!s) return "";
+  const items = s.parts
+    .map((p) =>
+      p === post
+        ? `<li><span aria-current="page">${e(p.title)}</span></li>`
+        : `<li><a href="/${e(p.slug)}/">${e(p.title)}</a></li>`
+    )
+    .join("");
+  return `\n  <nav class="series" id="series" aria-labelledby="series-label"><h2 id="series-label">${e(s.name)}</h2><ol>${items}</ol></nav>`;
+}
+
+function contents(post) {
+  if (!post.toc?.length) return "";
+  const items = post.toc.map((h) => `<li><a href="#${e(h.id)}">${h.html}</a></li>`).join("");
+  return `\n  <nav class="toc" aria-labelledby="toc-label"><h2 id="toc-label">Contents</h2><ol>${items}</ol></nav>`;
+}
+
 export function postBody(post, { older, newer }) {
   const draft = post.draft ? `<p class="draft-banner">Draft. Only visible in local preview.</p>\n` : "";
   const cell = (p, cls, label, rel) =>
@@ -100,12 +125,12 @@ export function postBody(post, { older, newer }) {
   return `${draft}<article class="post">
   <header class="post-header">
     <h1>${e(post.title)}</h1>
-    <p class="meta"><time datetime="${e(post.date)}">${e(formatDateLong(post.date))}</time>${readingTime(post)}</p>
-  </header>
+    <p class="meta"><time datetime="${e(post.date)}">${e(formatDateLong(post.date))}</time>${readingTime(post)}</p>${seriesNote(post)}
+  </header>${contents(post)}
   <div class="prose">
 ${post.content}
   </div>
-  <p class="end-mark">${FLAME}</p>
+  <p class="end-mark">${FLAME}</p>${seriesNav(post)}
 </article>${nav}`;
 }
 
@@ -197,7 +222,7 @@ export function atomFeed(site, posts, updated) {
     <published>${p.date}T00:00:00Z</published>
     <updated>${p.date}T00:00:00Z</updated>
     <summary>${e(p.excerpt)}</summary>
-    <content type="html">${e(p.content)}</content>
+    <content type="html">${e(p.feedContent || p.content)}</content>
   </entry>`
     )
     .join("\n");

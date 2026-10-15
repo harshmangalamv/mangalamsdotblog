@@ -1,0 +1,94 @@
+Title: Why Bihar stayed poor, part 1: the shape of the problem
+Date: 2026-10-16
+Status: draft
+Series: Why Bihar stayed poor
+Slug: why-bihar-stayed-poor-1
+Description: An example of a long, sourced essay on mangalams.blog. Replace it with the real first part of the series.
+
+<!--
+  EXAMPLE DRAFT. This file shows every feature a long, sourced essay can use.
+  Everything inside these comment markers is a note to you; it never appears on the site.
+  Preview it with:  npm.cmd run dev   then open http://localhost:5500/why-bihar-stayed-poor-1/
+
+  The header above:
+    Status: draft       keeps it off the live site. Delete the line to publish.
+    Series:             posts with the same series name are linked as Part 1, Part 2, ...
+    Slug:               a short, permanent URL you choose. Without it the URL comes from the title.
+    Description:        what search engines and link previews show. Without it, the opening lines are used.
+
+  The facts below were checked on 16 Oct 2026 against the sources in the notes.
+  Keep or replace them; the argument in between is placeholder text for your own.
+-->
+
+Bihar is home to roughly one Indian in twelve, and for most of the last seventy years it has sat at or near the bottom of almost every list that measures how well people live. This series asks a simple question: how did that happen, and why has it been so hard to change?
+
+<!-- An opening paragraph like this one becomes the excerpt on the home page,
+     unless the Description header is set. Keep it short and concrete. -->
+
+## The question
+
+Poverty this persistent rarely has a single cause. It is usually a stack of decisions, accidents and habits that reinforce one another. The aim of this first part is to lay out the shape of the problem before arguing about causes.
+
+<!-- "##" makes a section heading. Each one gets its own link (hover it, then copy),
+     and a post with four or more sections gets a Contents list at the top automatically. -->
+
+## What the numbers say
+
+Start with something basic: how many people can read and write. In the 2011 census, Bihar had the lowest literacy rate of any state.[^literacy]
+
+| Region | Literacy rate, 2011 |
+|---|--:|
+| Kerala | 93.91% |
+| India | 74.04% |
+| Bihar | 63.82% |
+
+<!-- A table: a header row, then a separator row, then data.
+     "--:" right-aligns a column (use it for numbers); ":--:" centres it.
+     Every row must have the same number of cells, or the build stops and tells you which row. -->
+
+A gap of thirty percentage points with Kerala is not a statistic you can explain with one policy. It reflects decades of differences in schooling, in who got to go to school, and in what a family could afford to give up when a child sat in a classroom instead of working.
+
+### A note on sources
+
+Numbers on Bihar differ by source and by year, and some figures are revised after first publication.[^revisions] Every figure in this series links to where it came from, so you can check it yourself.
+
+<!-- "###" is a smaller heading inside a section. It does not appear in the Contents list. -->
+
+## A policy that tilted the map
+
+One explanation that comes up again and again is the **freight equalisation policy**. From 1952 to 1993, the central government subsidised the transport of minerals so that factories anywhere in India paid roughly the same for them.[^freight] Bihar, which then included the mineral belt that is now Jharkhand, lost the advantage of having those minerals next door.
+
+> The policy is often blamed for keeping industry away from the east. How much it actually explains is the question part 3 will take up.
+
+<!-- ">" makes a block quote: use it for quotations from sources, or to set a point apart.
+     Bold (**like this**) is for the one phrase a skimming reader must not miss. Use it rarely. -->
+
+## What this series will cover
+
+1. The shape of the problem (this part)
+2. Land, caste and who owned what
+3. Industry, minerals and the freight question
+4. Schools, health and the state
+5. What an honest way out could look like
+
+<!-- Numbered lists: "1." at the start of each line. Bulleted lists: "-" instead.
+     Leave a blank line before a list. -->
+
+---
+
+<!-- "---" on its own line draws a short divider, for a change of scene within an essay. -->
+
+None of this is settled, and some of it is contested. Where the evidence is weak, the essays will say so. If you know a better source for anything here, [tell me](/about/).
+
+<!-- Images: put the file in the assets folder, then write a line like
+       ![Map of Bihar's districts, 2011](/assets/bihar-districts.png)
+     The text in brackets is the caption, and what screen readers announce. -->
+
+[^literacy]: Provisional Census 2011 figures, as published on [Know India](https://knowindia.india.gov.in/profile/literacy.php), Government of India.
+[^revisions]: The final Census 2011 tables revise these provisional literacy figures slightly. When comparing sources, check which set each one uses.
+[^freight]: [Freight equalisation policy](https://en.wikipedia.org/wiki/Freight_equalisation_policy), Wikipedia. Follow its references to the primary sources before relying on it.
+
+<!-- Footnotes: put [^name] in the text where the note applies, then a line
+       [^name]: the source, with a link
+     anywhere in the post (the end is tidiest). They are numbered automatically in reading order.
+     The build stops if a note is used but not written, or written but never used. -->

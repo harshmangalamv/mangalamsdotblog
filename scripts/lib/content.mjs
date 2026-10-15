@@ -11,7 +11,7 @@ export class ContentError extends Error {}
 
 const POST_FILENAME = /^(\d{2})-(\d{2})-(\d{4})-(\d+)\.(txt|md)$/i;
 const HEADER_LINE = /^([A-Za-z][A-Za-z-]*)\s*:\s*(.*)$/;
-const POST_KEYS = new Set(["title", "date", "slug", "status", "description"]);
+const POST_KEYS = new Set(["title", "date", "slug", "status", "description", "series"]);
 const PAGE_KEYS = new Set(["title", "description"]);
 const STATUSES = new Set(["published", "draft"]);
 
@@ -91,6 +91,7 @@ export function parsePost(text, filename) {
     slug: header.slug || null,
     draft: status === "draft",
     description: header.description || null,
+    series: header.series || null,
     content,
     text: htmlToText(content),
   };

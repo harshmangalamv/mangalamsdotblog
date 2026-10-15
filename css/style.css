@@ -382,6 +382,169 @@ main,
     font-size: 0.875rem;
 }
 
+/* Tables: data stays in its own scroll box on narrow screens */
+.prose .table-wrap {
+    margin: 0 0 1.4em 0;
+    overflow-x: auto;
+}
+
+.prose table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+    font-variant-numeric: tabular-nums lining-nums;
+    line-height: 1.45;
+}
+
+.prose th,
+.prose td {
+    padding: 0.5em 0.75em 0.5em 0;
+    border-bottom: 1px solid var(--rule);
+    text-align: left;
+    vertical-align: top;
+}
+
+.prose th:last-child,
+.prose td:last-child {
+    padding-right: 0;
+}
+
+.prose th {
+    color: var(--ink);
+    font-weight: 700;
+    border-bottom-color: var(--muted);
+}
+
+.prose .align-right {
+    text-align: right;
+}
+
+.prose .align-center {
+    text-align: center;
+}
+
+/* Footnotes: small raised numbers in the text, a quiet list at the end */
+.fn-ref {
+    line-height: 0;
+    font-size: 0.72em;
+    font-variant-numeric: lining-nums;
+}
+
+.fn-ref a {
+    padding-inline: 0.1em;
+    text-decoration: none;
+}
+
+.prose .fn-ref a:hover {
+    text-decoration: underline;
+}
+
+.footnotes {
+    margin-top: 3rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--rule);
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.55;
+}
+
+.footnotes h2 {
+    margin: 0 0 0.75rem 0;
+    color: var(--muted);
+    font-size: 0.9375rem;
+    font-weight: 400;
+}
+
+.footnotes ol {
+    margin: 0;
+    padding-left: 1.4em;
+}
+
+.footnotes li + li {
+    margin-top: 0.45em;
+}
+
+.footnotes li:target {
+    color: var(--ink);
+}
+
+.prose .fn-back {
+    text-decoration: none;
+}
+
+.prose [id^="fn"],
+.prose [id^="fnref"] {
+    scroll-margin-top: 1.5rem;
+}
+
+/* Contents for long essays, and the series a post belongs to */
+.toc,
+.series {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+}
+
+.toc {
+    margin: -0.75rem 0 2.25rem 0;
+}
+
+.toc h2,
+.series h2 {
+    margin: 0 0 0.5rem 0;
+    color: var(--muted);
+    font-size: 0.9375rem;
+    font-weight: 400;
+}
+
+.toc ol,
+.series ol {
+    margin: 0;
+    padding-left: 1.4em;
+}
+
+.toc li + li,
+.series li + li {
+    margin-top: 0.3em;
+}
+
+.toc li::marker,
+.series li::marker {
+    color: var(--muted);
+}
+
+.toc a,
+.series a {
+    text-decoration: none;
+}
+
+.toc a:hover,
+.series a:hover {
+    text-decoration: underline;
+}
+
+.series-note {
+    margin: 0.35rem 0 0 0;
+    color: var(--muted);
+    font-size: 0.875rem;
+}
+
+.series-note a {
+    color: inherit;
+    text-underline-offset: 0.2em;
+}
+
+.series {
+    margin-top: 2.5rem;
+    padding: 1rem 1.1rem;
+    border-left: 2px solid var(--rule);
+    scroll-margin-top: 1.5rem;
+}
+
+.series [aria-current="page"] {
+    color: var(--ink);
+    font-weight: 700;
+}
+
 /* The flame closes every essay */
 .end-mark {
     margin: 2.5rem 0 0 0;
@@ -528,6 +691,11 @@ main,
 
     .site-header {
         padding-block: 0 1.5rem;
+    }
+
+    .toc,
+    .fn-back {
+        display: none;
     }
 
     .prose a[href^="http"]::after {

@@ -73,6 +73,7 @@ export function truncateWords(text, max) {
 export function htmlToText(html) {
   return decodeBasicEntities(
     String(html)
+      .replace(/<sup class="fn-ref"[^>]*>.*?<\/sup>/g, "")
       .replace(/<(br|hr)\b[^>]*>|<\/(p|h[1-6]|li|blockquote|figure|figcaption|ul|ol)>/gi, " ")
       .replace(/<[^>]*>/g, "")
   )

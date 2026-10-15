@@ -2,6 +2,9 @@
 
 A text-first personal blog, built to last. Posts are plain text files and the site is plain static HTML. There are no frameworks and no npm dependencies; Node is only used to build.
 
+**Writing?** See [WRITING.md](WRITING.md) for the writer's guide, and `posts_raw/16-10-2026-1.txt` for a draft that uses every feature.
+On Windows PowerShell, use `npm.cmd` in place of `npm` if script execution is disabled.
+
 ## Write a post
 
 ```powershell
@@ -23,7 +26,7 @@ Second paragraph.
 ```
 
 - **Filename** `dd-mm-yyyy-N.txt` (N = 1, 2, 3… for that day). The filename date is the post's date. `Date:` is optional, and if present must match the filename.
-- **Headers** (before the first blank line): `Title:` (required), `Date:`, `Status: draft` (left out of the published site), `Slug:` (custom URL), `Description:` (custom summary for search engines and link previews).
+- **Headers** (before the first blank line): `Title:` (required), `Date:`, `Status: draft` (left out of the published site), `Slug:` (custom URL), `Description:` (custom summary for search engines and link previews), `Series:` (links essays with the same series name as Part 1, 2, …).
 - To publish, delete the `Status: draft` line, then commit and push.
 
 ### Formatting
@@ -32,13 +35,16 @@ Second paragraph.
 |---|---|
 | a blank line | new paragraph |
 | `\` at the end of a line | line break (poetry) |
-| `## Heading` / `### Subheading` | headings (each one is linkable: `/post/#heading-text`; no links inside headings) |
+| `## Heading` / `### Subheading` | headings (each one is linkable: `/post/#heading-text`; no links inside headings). Four or more `##` add a Contents list |
 | `> quoted text` | block quote |
 | `- item` or `1. item` | lists (leave a blank line before) |
 | `[text](https://example.com)` | link (`https://`, `mailto:` or `/site-path` only) |
 | `**bold**`, `*italic*`, `` `code` `` | emphasis, code |
 | `![description](/assets/photo.jpg)` | image (put files in `assets/`) |
 | `---` | horizontal rule |
+| `text[^src]` and a line `[^src]: source` | numbered footnote, listed under "Notes" (the build stops on a missing or unused note) |
+| `\| a \| b \|` + `\|---\|--:\|` + rows | table (`--:` right-aligns, `:--:` centres; every row needs the same number of cells) |
+| `<!-- note to self -->` | comment, never published |
 | `\*` | a literal `*` |
 
 Everything else is plain text, and `<`, `>` and `&` are always shown as written.
