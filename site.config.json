@@ -10,5 +10,47 @@
     "https://github.com/harshmangalamv",
     "https://www.linkedin.com/in/harshmangalamv/",
     "https://leetcode.com/harshmangalamv/"
-  ]
+  ],
+  "contact": "010a0640000c04030b2513030d090409020408061f170406",
+  "since": 2026,
+  "crawlers": {
+    "_comment": "Search engines (Googlebot, Bingbot, Applebot, DuckDuckBot...) can read everything. 'blocked' bots collect pages to train AI models and are kept out entirely. 'limited' bots power AI answers and user-requested fetches; they may read only the paths in 'limitedAllow'. robots.txt is honoured by the major AI companies, but it is a request, not a lock.",
+    "blocked": [
+      "GPTBot",
+      "ClaudeBot",
+      "anthropic-ai",
+      "Google-Extended",
+      "Applebot-Extended",
+      "meta-externalagent",
+      "CCBot",
+      "Bytespider",
+      "Amazonbot",
+      "cohere-ai",
+      "cohere-training-data-crawler",
+      "AI2Bot",
+      "Diffbot",
+      "PanguBot",
+      "Timpibot",
+      "ImagesiftBot",
+      "Omgilibot",
+      "omgili",
+      "FacebookBot"
+    ],
+    "limited": [
+      "OAI-SearchBot",
+      "ChatGPT-User",
+      "Claude-SearchBot",
+      "Claude-User",
+      "PerplexityBot",
+      "Perplexity-User",
+      "meta-externalfetcher",
+      "DuckAssistBot",
+      "MistralAI-User"
+    ],
+    "limitedAllow": [
+      "/$",
+      "/archive/",
+      "/about/"
+    ]
+  }
 }

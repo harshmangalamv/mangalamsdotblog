@@ -37,7 +37,6 @@ export function layout(site, page) {
   const meta = [
     `<meta name="description" content="${e(description)}">`,
     url ? `<link rel="canonical" href="${e(url)}">` : "",
-    noindex ? `<meta name="robots" content="noindex">` : "",
     `<meta property="og:site_name" content="${e(site.title)}">`,
     `<meta property="og:type" content="${type}">`,
     `<meta property="og:title" content="${e(page.ogTitle || title)}">`,
@@ -46,6 +45,10 @@ export function layout(site, page) {
     date ? `<meta property="article:published_time" content="${e(date)}">` : "",
     `<meta name="twitter:card" content="summary">`,
     `<meta name="author" content="${e(site.author)}">`,
+    // Opt-outs for AI training and text-and-data mining (honoured by some crawlers;
+    // robots.txt carries the main rules).
+    `<meta name="robots" content="${noindex ? "noindex, " : ""}noai, noimageai">`,
+    `<meta name="tdm-reservation" content="1">`,
     // rel="me" tells search engines and the fediverse these profiles are the same person
     ...(site.profiles || []).map((href) => `<link rel="me" href="${e(href)}">`),
     jsonLd(structured),
@@ -79,7 +82,7 @@ export function layout(site, page) {
 ${body}
   </main>
   <footer class="site-footer">
-    <p>Written by ${e(site.author)}. <a href="/feed.xml">Subscribe with RSS</a></p>
+    <p>© ${site.since && site.since < new Date().getUTCFullYear() ? `${site.since}–` : ""}${new Date().getUTCFullYear()} ${e(site.author)}. <a href="/feed.xml">Subscribe with RSS</a></p>
   </footer>
 ${scripts.map((src) => `  <script type="module" src="${e(src)}"></script>`).join("\n")}
 </body>
@@ -256,4 +259,29 @@ export function sitemap(site, entries) {
 ${urls}
 </urlset>
 `;
+}
+
+// The email is never written into the page; contact.js assembles it on click.
+export function emailReveal(encoded) {
+  return `<span class="email" data-x="${e(encoded)}"><button type="button" class="email-reveal" hidden>Show email address</button><noscript>Turn on JavaScript to see the email address.</noscript></span>`;
+}
+
+// robots.txt: search engines read everything; AI training crawlers read nothing;
+// AI answer and user-requested fetchers read only the listed paths.
+export function robots(site) {
+  const c = site.crawlers || {};
+  const lines = ["# Search engines: everything.", "User-agent: *", "Allow: /", ""];
+  if (c.blocked?.length) {
+    lines.push("# AI training crawlers: nothing.");
+    for (const bot of c.blocked) lines.push(`User-agent: ${bot}`);
+    lines.push("Disallow: /", "");
+  }
+  if (c.limited?.length) {
+    lines.push("# AI answer engines and user-requested fetches: only these pages.");
+    for (const bot of c.limited) lines.push(`User-agent: ${bot}`);
+    for (const allowed of c.limitedAllow || []) lines.push(`Allow: ${allowed}`);
+    lines.push("Disallow: /", "");
+  }
+  lines.push(`Sitemap: ${site.url}/sitemap.xml`, "");
+  return lines.join("\n");
 }

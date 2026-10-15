@@ -610,6 +610,29 @@ main,
     color: var(--link);
 }
 
+/* "Show email address": looks like a link, assembled on click by contact.js */
+.email-reveal {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--link);
+    font: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--link-line);
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+}
+
+.email-reveal:hover {
+    text-decoration-color: currentColor;
+}
+
+.email-reveal:focus-visible {
+    outline: 2px solid var(--link);
+    outline-offset: 3px;
+    border-radius: 2px;
+}
+
 /* Local preview only */
 .draft-banner {
     margin: 0 0 2rem 0;

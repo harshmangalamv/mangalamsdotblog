@@ -2,7 +2,7 @@
   "name": "mangalamsdotblog",
   "private": true,
   "type": "module",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "engines": {
     "node": ">=20"
   },
@@ -11,6 +11,7 @@
     "dev": "node scripts/build.mjs --drafts && node scripts/serve.mjs",
     "serve": "node scripts/serve.mjs",
     "new": "node scripts/new-post.mjs",
-    "test": "node --test"
+    "test": "node --test",
+    "encode-email": "node scripts/encode-email.mjs"
   }
 }

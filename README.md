@@ -70,6 +70,13 @@ One-time setup (done by hand, see the steps in CLAUDE.md › Search engines): ve
 
 Good habits per essay: a specific title, a `Description:` line for anything long, a link to related earlier essays, and sources linked in footnotes.
 
+## Content control
+
+- **AI crawlers** (`site.config.json` → `crawlers`, written into `robots.txt`): search engines read everything; AI *training* crawlers (GPTBot, ClaudeBot, Google-Extended, Meta, Common Crawl…) read nothing; AI *answer* engines and user-requested fetches (ChatGPT search, Claude, Perplexity…) read only the home page, archive and About. Edit the lists or `limitedAllow` to change this.
+- **Rights**: essays are © all rights reserved, with a text-and-data-mining opt-out (`/.well-known/tdmrep.json`, `tdm-reservation` and `noai` meta tags). Code is MIT. See `LICENSE`.
+- **Email**: never written in any file or page. `site.config.json` → `contact` holds a scrambled copy (`npm run encode-email -- you@example.com`); `{{email}}` in a page shows a "Show email address" button that assembles it in the reader's browser.
+- Limits: robots.txt is a request the major AI companies honour, not a lock. Hard blocking needs a proxy such as Cloudflare in front of the site.
+
 ## Other pages
 
 `pages_raw/about.txt` becomes `/about/`. Any other `pages_raw/<name>.txt` becomes `/<name>/` and appears in the menu. It uses the same format, with only `Title:` and `Description:` headers.
@@ -83,6 +90,7 @@ Good habits per essay: a specific title, a `Description:` line for anything long
 | `npm run build` | production build into `dist/` |
 | `npm run serve` | serve the existing `dist/` |
 | `npm test` | run the tests (includes building this repository) |
+| `npm run encode-email -- you@example.com` | scrambled address for `site.config.json` → `contact` |
 
 Requires Node 20 or newer. Nothing to install.
 

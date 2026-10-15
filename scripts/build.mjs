@@ -95,9 +95,15 @@ export async function build({ root = process.cwd(), outDir = path.join(root, "di
   // Static assets, fingerprinted with ?v= so browsers never keep stale CSS/JS.
   const css = await fs.readFile(path.join(root, "css", "style.css"));
   const feedJs = await fs.readFile(path.join(root, "src", "feed.js"));
+  const contactJs = await fs.readFile(path.join(root, "src", "contact.js"));
   await writeFile(resolvedOut, "css/style.css", css);
   await writeFile(resolvedOut, "js/feed.js", feedJs);
-  site.assets = { css: `/css/style.css?v=${hash(css)}`, feedJs: `/js/feed.js?v=${hash(feedJs)}` };
+  await writeFile(resolvedOut, "js/contact.js", contactJs);
+  site.assets = {
+    css: `/css/style.css?v=${hash(css)}`,
+    feedJs: `/js/feed.js?v=${hash(feedJs)}`,
+    contactJs: `/js/contact.js?v=${hash(contactJs)}`,
+  };
   if (await exists(path.join(root, "assets"))) {
     await fs.cp(path.join(root, "assets"), path.join(resolvedOut, "assets"), { recursive: true });
   }
@@ -193,6 +199,11 @@ export async function build({ root = process.cwd(), outDir = path.join(root, "di
     })
   );
   for (const [name, pg] of Object.entries(pages)) {
+    const withEmail = pg.content.includes("{{email}}");
+    if (withEmail && !site.contact) {
+      throw new ContentError(`pages_raw/${name}: uses {{email}} but site.config.json has no "contact". Run: npm run encode-email -- you@example.com`);
+    }
+    const content = pg.content.replaceAll("{{email}}", t.emailReveal(site.contact));
     await writeFile(
       resolvedOut,
       `${name}/index.html`,
@@ -203,7 +214,8 @@ export async function build({ root = process.cwd(), outDir = path.join(root, "di
         path: `/${name}/`,
         current: name,
         structured: name === "about" ? [seo.profilePage(site, "/about/")] : [],
-        body: t.pageBody(pg),
+        body: t.pageBody({ ...pg, content }),
+        scripts: withEmail ? [site.assets.contactJs] : [],
       })
     );
   }
@@ -227,7 +239,10 @@ export async function build({ root = process.cwd(), outDir = path.join(root, "di
       ...live.map((p) => ({ path: `/${p.slug}/`, lastmod: p.date })),
     ])
   );
-  await writeFile(resolvedOut, "robots.txt", `User-agent: *\nAllow: /\n\nSitemap: ${site.url}/sitemap.xml\n`);
+  await writeFile(resolvedOut, "robots.txt", t.robots(site));
+  // W3C TDMRep: a machine-readable "text and data mining rights reserved" notice
+  // (the opt-out recognised by EU copyright law, Art. 4 of the DSM Directive).
+  await writeFile(resolvedOut, ".well-known/tdmrep.json", `${JSON.stringify([{ location: "/*", "tdm-reservation": 1 }], null, 2)}\n`);
 
   log(`Built ${live.length} post(s)${draftPosts.length ? ` + ${draftPosts.length} draft(s)` : ""}, ${pageCount} feed page(s) -> ${path.relative(root, resolvedOut) || "."}`);
   return { posts, registryChanged, outDir: resolvedOut };

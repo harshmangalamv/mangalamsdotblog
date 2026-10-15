@@ -35,6 +35,7 @@ Every page is complete HTML, so it works with JS disabled. The only JS is `src/f
 | `scripts/lib/seo.mjs` | schema.org JSON-LD: WebSite + Person (home), BlogPosting (posts), ProfilePage (about). Person.sameAs = `site.config.json` → `profiles` |
 | `scripts/lib/util.mjs` | escape, slugify (ASCII only), UTC date formatting, excerpt truncation |
 | `scripts/serve.mjs` | local server mimicking Pages (301 to trailing slash, 404.html with status 404) |
+| `scripts/encode-email.mjs` / `src/contact.js` | scramble / click-to-reveal email (`{{email}}` in pages_raw only). Same XOR KEY in both |
 | `scripts/new-post.mjs` | `npm run new -- "Title"` → today's draft |
 | `test/build.test.mjs` | node:test: markup, parser, slugs, dates, an end-to-end fixture build, and a build of the real repo |
 | `.github/workflows/deploy.yml` | push to master → test → build → commit slugs.json if new → upload → deploy |
@@ -55,7 +56,9 @@ Markup extras: footnotes `[^id]` + `[^id]: …` (strict: missing/unused/duplicat
 4. **Fail loudly.** Bad filenames, date mismatches, unknown headers, unsafe links and slug clashes stop the build.
 5. **The Atom `<id>` is `tag:<host>,<date>:<post id>`**, so it is stable even if the slug changes. Never change this format.
 6. **Stay dependency-free and static.** Prefer build-time work over runtime JS.
-7. Reserved top-level names: archive, assets, css, data, js, feed, rss, atom, page, tag, tags, search, 404, index, plus every `pages_raw` name.
+7. **Never write Harsh's email in plain text** anywhere (repo files, pages, feed, JSON-LD, commit messages). Only the scrambled `contact` value + `{{email}}`.
+8. **Content control**: essays are © all rights reserved (LICENSE); AI training crawlers fully disallowed, AI answer/user fetchers limited to `/`, `/archive/`, `/about/` (config → robots.txt); TDM opt-out via `/.well-known/tdmrep.json` (workflow uploads hidden files) + meta. Don't loosen without Harsh asking.
+9. Reserved top-level names: archive, assets, css, data, js, feed, rss, atom, page, tag, tags, search, 404, index, plus every `pages_raw` name.
 
 ## Design system ("ink by day, lamplight by night")
 
@@ -83,8 +86,15 @@ Markup extras: footnotes `[^id]` + `[^id]: …` (strict: missing/unused/duplicat
 
 ## Status (2026-10-16)
 
-- Published: "Ail Ail Aimshh" → `/ail-ail-aimshh/`, "the flickering lamp" → `/the-flickering-lamp/`.
-- The design refresh and long-essay toolkit (branch `ux_refresh`) are merged to master and live.
+- Published: "Ail Ail Aimshh" → `/ail-ail-aimshh/`, "the flickering lamp" → `/the-flickering-lamp/`, About page (no employer named, by request).
+- Live: design refresh (Neel background, no logo yet), long-essay toolkit, search-engine groundwork, content controls.
+
+## REMIND HARSH at the start of the next session (he asked; remove items once done)
+
+1. One-time search setup (see "Search engines" above): Google Search Console (domain TXT at Hostinger, submit sitemap, request indexing of / and /about/), Bing Webmaster Tools import, GitHub profile Website → https://mangalams.blog, LinkedIn website + Featured.
+2. Decide: the GitHub repo is public, so drafts in posts_raw/ and the full text are readable on GitHub regardless of robots.txt. Options: keep public; GitHub Pro ($4/mo) to make it private and keep Pages; or keep drafts out of git.
+3. His public commits carry his Gmail address as author. Fix: GitHub Settings → Emails → "Keep my email addresses private" + "Block command line pushes that expose my email", then `git config --global user.email <id>+harshmangalamv@users.noreply.github.com`.
+4. Optional: Cloudflare (free) in front of the site for hard AI-bot blocking ("Block AI bots" toggle); needs nameservers moved from Hostinger to Cloudflare.
 - Planned: a fact-backed series on why Bihar remains poor. Links (`[text](https://…)`) are supported for citations.
 - Remaining ideas: REVIEW.md.
 

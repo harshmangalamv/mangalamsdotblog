@@ -1,25 +1,16 @@
 Title: About
 Description: Harsh Mangalam Verma is a software engineer in Hyderabad who writes essays on technology, India and Bihar.
 
-<!--
-  DRAFT FOR HARSH TO CHECK. Notes in these comments never appear on the site.
-  Everything below comes from what you have told me or from your public GitHub profile.
-  Delete or change anything you don't want public, then tell me and I'll publish it.
--->
-
 I'm Harsh Mangalam Verma. This is where I write: essays on technology, on India, and on questions I keep coming back to, like why Bihar stayed poor for so long.
 
-I'm a software engineer at ZL Technologies in Hyderabad, where I work across the backend and frontend, and on connecting AI models to enterprise software.
+I'm a software engineer in Hyderabad, working across the backend and frontend.
 
-<!-- CHECK: is naming your employer OK? If not, use:
-     "I'm a software engineer in Hyderabad, working across the backend and frontend." -->
-
-I studied at IIT Patna (B.Tech, 2020 to 2024), and co-authored a peer-reviewed paper on deep learning in the *Journal of Water Process Engineering* (2025).
-
-<!-- CHECK: add the paper's title and a link (DOI) if you'd like it findable:
-     [Paper title](https://doi.org/...) -->
+I studied at IIT Patna (B.Tech, 2020 to 2024), and co-authored a peer-reviewed paper on deep learning in the [*Journal of Water Process Engineering*](https://www.sciencedirect.com/science/article/abs/pii/S2214714425014151) (2025).
 
 Elsewhere: [GitHub](https://github.com/harshmangalamv), [LinkedIn](https://www.linkedin.com/in/harshmangalamv/), [LeetCode](https://leetcode.com/harshmangalamv/). New essays arrive by [RSS](/feed.xml).
 
-<!-- OPTIONAL: a way to reach you. An email address on a public page attracts spam;
-     a line like "The best way to reach me is a message on LinkedIn." works too. -->
+To write to me: {{email}}
+
+<!-- The email address is not in this file or in the built page. It is stored scrambled in
+     site.config.json ("contact") and shown only when a reader clicks the button.
+     To change it: npm.cmd run encode-email -- new@address.com -->

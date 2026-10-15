@@ -9,6 +9,7 @@ import { parsePost, ContentError } from "../scripts/lib/content.mjs";
 import { assignSlugs, SlugError } from "../scripts/lib/slugs.mjs";
 import { slugify, formatDateLong, truncateWords, htmlToText } from "../scripts/lib/util.mjs";
 import { build } from "../scripts/build.mjs";
+import { encodeEmail } from "../scripts/encode-email.mjs";
 
 const post = (text, file = "05-09-2026-1.txt") => parsePost(text, file);
 
@@ -216,6 +217,7 @@ async function fixture(files) {
     "site.config.json": JSON.stringify({ title: "t.blog", url: "https://t.blog/", author: "A", description: "D", pageSize: 2 }),
     "css/style.css": "body{}",
     "src/feed.js": "// js",
+    "src/contact.js": "// js",
     CNAME: "t.blog\n",
     "pages_raw/about.txt": "Title: About\n\nHi.",
   };
@@ -358,6 +360,54 @@ test("search engines: name in titles, author links, valid structured data", asyn
   assert.equal(ld(about)["@graph"][0]["@type"], "ProfilePage");
 
   assert.doesNotMatch(await read(root, "draft/index.html"), /application\/ld\+json/); // drafts carry no structured data
+});
+
+test("content control: AI crawler rules, data-mining opt-out, hidden email", async () => {
+  const email = "someone@example.org";
+  const root = await fixture({
+    "site.config.json": JSON.stringify({
+      title: "t.blog", url: "https://t.blog", author: "A", description: "D",
+      contact: encodeEmail(email),
+      crawlers: { blocked: ["GPTBot", "ClaudeBot"], limited: ["OAI-SearchBot"], limitedAllow: ["/$", "/about/"] },
+    }),
+    "pages_raw/about.txt": "Title: About\n\nWrite to me: {{email}}",
+    "posts_raw/01-01-2026-1.txt": "Title: Essay\n\nText.",
+  });
+  await build({ root, log: () => {} });
+
+  const robots = await read(root, "robots.txt");
+  assert.match(robots, /User-agent: \*\nAllow: \/\n/); // search engines see everything
+  assert.match(robots, /User-agent: GPTBot\nUser-agent: ClaudeBot\nDisallow: \/\n/);
+  assert.match(robots, /User-agent: OAI-SearchBot\nAllow: \/\$\nAllow: \/about\/\nDisallow: \/\n/);
+  assert.deepEqual(JSON.parse(await read(root, ".well-known/tdmrep.json")), [{ location: "/*", "tdm-reservation": 1 }]);
+
+  const about = await read(root, "about/index.html");
+  assert.match(about, /<meta name="tdm-reservation" content="1">/);
+  assert.match(about, /<meta name="robots" content="noai, noimageai">/);
+  assert.match(about, /<span class="email" data-x="[0-9a-f]+"><button type="button" class="email-reveal" hidden>/);
+  assert.match(about, /<script type="module" src="\/js\/contact\.js\?v=/);
+
+  // The address never appears in any built file, in any common form.
+  const files = await fs.readdir(path.join(root, "dist"), { recursive: true });
+  for (const f of files) {
+    const full = path.join(root, "dist", f);
+    if ((await fs.stat(full)).isDirectory()) continue;
+    const text = await fs.readFile(full, "utf8");
+    assert.ok(!text.includes("someone") && !text.includes("example.org"), `email leaked into ${f}`);
+  }
+  assert.match(await read(root, "404.html"), /<meta name="robots" content="noindex, noai, noimageai">/);
+});
+
+test("the email encoder round-trips with the in-browser decoder", async () => {
+  const src = await fs.readFile(new URL("../src/contact.js", import.meta.url), "utf8");
+  const key = src.match(/const KEY = "([^"]+)"/)[1];
+  const decode = (hex) => hex.match(/../g).reverse().map((h, i) => String.fromCharCode(parseInt(h, 16) ^ key.charCodeAt(i % key.length))).join("");
+  for (const addr of ["a@b.co", "harsh.v+blog@example.com"]) assert.equal(decode(encodeEmail(addr)), addr);
+});
+
+test("{{email}} without a configured contact fails the build", async () => {
+  const root = await fixture({ "pages_raw/contact.txt": "Title: Contact\n\n{{email}}" });
+  await assert.rejects(build({ root, log: () => {} }), /no "contact"/);
 });
 
 test("build fails loudly on a broken post", async () => {

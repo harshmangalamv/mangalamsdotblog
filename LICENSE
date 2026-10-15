@@ -1,0 +1,40 @@
+This repository contains two kinds of material under different terms.
+
+1. Writing: all rights reserved
+
+   The essays, pages and other text in posts_raw/ and pages_raw/, and the
+   pages built from them, are Copyright (c) 2026 Harsh Mangalam Verma.
+   All rights reserved.
+
+   You may read them and link to them, and quote short passages with
+   attribution and a link to the original. You may not republish them in
+   full, and you may not use them to train, fine-tune or evaluate machine
+   learning or AI models, or for any other text and data mining, without
+   written permission. This reservation of rights is made under Article 4(3)
+   of EU Directive 2019/790 and is also expressed in machine-readable form
+   (robots.txt, /.well-known/tdmrep.json and page metadata).
+
+2. Code: MIT License
+
+   Everything else (scripts/, src/, css/, test/, the workflow and config
+   files) is released under the MIT License:
+
+   Copyright (c) 2026 Harsh Mangalam Verma
+
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files (the "Software"), to deal
+   in the Software without restriction, including without limitation the rights
+   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   copies of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+
+   The above copyright notice and this permission notice shall be included in
+   all copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.
