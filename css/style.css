@@ -1,6 +1,6 @@
 /* mangalams.blog
-   Ink by day, lamplight by night. One reading column, one mark (the flame),
-   system serif type so nothing has to download before you can read. */
+   Ink by day, lamplight by night. One reading column and system serif type,
+   so nothing has to download before you can read. */
 
 /* =========================
    TOKENS
@@ -17,8 +17,6 @@
     --rule: #e6e2d9;
     --link: #34399a;
     --link-line: #b9bbe0;
-    --flame: #df8f2a;
-    --flame-core: #f7cf6d;
     --selection: #f6dfb8;
     --code-bg: #f3f1ec;
 
@@ -40,8 +38,6 @@
         --rule: #2d2f38;
         --link: #e9b765;
         --link-line: #6b5a3b;
-        --flame: #f2b24f;
-        --flame-core: #fde7a6;
         --selection: #4a3c22;
         --code-bg: #20222a;
     }
@@ -112,17 +108,11 @@ a:focus-visible {
     top: 0.75rem;
 }
 
-/* The flame mark */
-.flame {
-    display: inline-block;
+/* Logo slot beside the name (empty until the logo is ready) */
+.site-name .mark {
+    height: 1.05em;
     width: auto;
-    height: 1.1em;
-    fill: var(--flame);
-    vertical-align: -0.15em;
-}
-
-.flame .flame-core {
-    fill: var(--flame-core);
+    align-self: center;
 }
 
 /* =========================
@@ -153,11 +143,6 @@ main,
     color: var(--ink);
     font-size: 1.125rem;
     text-decoration: none;
-}
-
-.site-name .flame {
-    height: 1.05em;
-    align-self: center;
 }
 
 .site-header ul {
@@ -543,16 +528,6 @@ main,
 .series [aria-current="page"] {
     color: var(--ink);
     font-weight: 700;
-}
-
-/* The flame closes every essay */
-.end-mark {
-    margin: 2.5rem 0 0 0;
-    text-align: center;
-}
-
-.end-mark .flame {
-    height: 1.25rem;
 }
 
 .post-nav {

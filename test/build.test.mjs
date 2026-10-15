@@ -253,7 +253,7 @@ test("full build: pages, feed, drafts, redirects, unpublishing", async () => {
   // post pages, escaped titles, canonical, prev/next
   const one = await read(root, "old-one/index.html");
   assert.match(one, /<h1>Old &lt;one&gt;<\/h1>/);
-  assert.match(one, /class="end-mark"><svg class="flame"/);
+  assert.match(one, /<a class="site-name" href="\/"><span>t\.blog<\/span><\/a>/);
   assert.match(one, /<a href="\/feed\.xml">Subscribe with RSS<\/a>/);
   assert.match(one, /<a class="skip-link" href="#main">/);
   assert.doesNotMatch(one, /min read/); // short essays show no reading time

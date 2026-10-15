@@ -29,13 +29,14 @@ First review 2026-10-15. Status updated the same day after the static-site rebui
 | C5 | No archive | `/archive/`, grouped by year |
 | C7 | Feed cache only invalidated on post count | Feed files are content-hashed; restore state is keyed by that hash |
 | C8 | Reading UX | Window scrollbar visible, focus outlines, underlined body links, older/newer links under posts |
-| UX | Design refresh (branch `ux_refresh`) | Single reading column, flame mark, automatic dark mode, deliberate type scale (fixes the title-size conflict), linkable headings, reading time, skip link, print styles, RSS footer |
+| UX | Design refresh | Single reading column, automatic dark mode, deliberate type scale (fixes the title-size conflict), linkable headings, reading time, skip link, print styles, RSS footer |
+| B7 | Long essays | Footnotes, tables, series, contents list, comments; WRITING.md guide |
 | C9 | Dead code | SPA runtime replaced (see the deletion list in the commit notes) |
 
 ## Still open, by value
 
-1. **Write the About page** (`pages_raw/about.txt`). It is still placeholder text.
-2. **Series support for the Bihar essays**: a `Series:` header plus "Part n of m" and in-series previous/next links.
+1. **Logo**: design it, then fill `MARK` in templates.mjs and replace `favicon.svg`.
+2. **Write the About page** (`pages_raw/about.txt`). It is still placeholder text.
 3. **Social preview image**: a default `og:image` (and optionally one per post) so shared links show a card instead of plain text.
 4. **`Updated:` header** for revised essays, shown under the date and used as `<updated>` in the feed.
 5. **Search**: unnecessary until there are about 100 posts; the archive plus Ctrl+F covers it until then.

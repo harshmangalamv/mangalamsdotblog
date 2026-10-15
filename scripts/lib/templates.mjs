@@ -3,9 +3,10 @@
 
 import { escapeHtml as e, formatDateLong } from "./util.mjs";
 
-// The blog's one mark: a diya flame. Used beside the name, at the end of each
-// essay, and as the favicon. Colours come from CSS (currentColor + --flame-core).
-export const FLAME = `<svg class="flame" viewBox="0 0 16 22" aria-hidden="true" focusable="false"><path d="M8 1C8 1 2 8.6 2 13.6a6 6 0 0 0 12 0C14 8.6 8 1 8 1Z"/><path class="flame-core" d="M8 9.5C8 9.5 5.2 13 5.2 15.2a2.8 2.8 0 0 0 5.6 0C10.8 13 8 9.5 8 9.5Z"/></svg>`;
+// The site's mark, shown beside the name. Empty for now: the logo is being designed.
+// To add it later, set this to an inline <svg class="mark" aria-hidden="true">…</svg>
+// (and replace favicon.svg). Style it with .site-name .mark in css/style.css.
+export const MARK = "";
 
 const readingTime = (post) => (post.minutes >= 3 ? ` <span class="reading-time">${post.minutes} min read</span>` : "");
 
@@ -65,7 +66,7 @@ export function layout(site, page) {
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
-    <a class="site-name" href="/"${homeAria}>${FLAME}<span>${e(site.title)}</span></a>
+    <a class="site-name" href="/"${homeAria}>${MARK}<span>${e(site.title)}</span></a>
     <nav aria-label="Site"><ul>${nav}</ul></nav>
   </header>
   <main id="main">
@@ -130,7 +131,7 @@ export function postBody(post, { older, newer }) {
   <div class="prose">
 ${post.content}
   </div>
-  <p class="end-mark">${FLAME}</p>${seriesNav(post)}
+${seriesNav(post)}
 </article>${nav}`;
 }
 

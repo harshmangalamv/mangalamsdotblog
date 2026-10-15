@@ -58,12 +58,12 @@ Markup extras: footnotes `[^id]` + `[^id]: …` (strict: missing/unused/duplicat
 
 ## Design system ("ink by day, lamplight by night")
 
-- One mark: the diya flame (`FLAME` in templates.mjs, `favicon.svg`): beside the name, as the end-of-essay mark, as the favicon. Don't add other decoration.
-- Day: paper `#fdfcf9`, ink `#1f1d1a`, links indigo `#34399a`, flame `#df8f2a`. Night (automatic): `#16171d`, `#ece7dc`, links amber `#e9b765`.
+- No logo yet (Harsh is designing one). `MARK` in templates.mjs is the empty slot beside the site name; `favicon.svg` is a placeholder "m". Essays end in plain space. Don't add decoration.
+- Day: paper `#fdfcf9`, ink `#1f1d1a`, links indigo `#34399a`. Night (automatic, follows the reader's OS/browser theme): `#16171d`, `#ece7dc`, links amber `#e9b765`.
 - Type: system serif stack (Charter / Sitka Text / Georgia...), no web fonts. Body 17→19px, line-height 1.65, ~65ch measure.
 - No all-caps labels, no `→` arrows, no cards or shadows. Structure comes from whitespace; hairline rules only where they separate the essay from navigation.
 - Section headings get ids and link to themselves; links/footnotes inside headings are rejected by the build.
-- Footnotes, contents and the series box are muted, small, and use hairline rules, never the flame colour.
+- Footnotes, contents and the series box are muted, small, and use hairline rules, never an accent colour.
 - Reading time shows only for essays of 3+ minutes (230 wpm).
 
 ## Known quirks
@@ -73,7 +73,7 @@ Markup extras: footnotes `[^id]` + `[^id]: …` (strict: missing/unused/duplicat
 ## Status (2026-10-16)
 
 - Published: "Ail Ail Aimshh" → `/ail-ail-aimshh/`, "the flickering lamp" → `/the-flickering-lamp/`.
-- Branch `ux_refresh`: the design system above, awaiting review before merging to master.
+- The design refresh and long-essay toolkit (branch `ux_refresh`) are merged to master and live.
 - Planned: a fact-backed series on why Bihar remains poor. Links (`[text](https://…)`) are supported for citations.
 - Remaining ideas: REVIEW.md.
 
