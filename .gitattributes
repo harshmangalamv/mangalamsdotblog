@@ -1,0 +1,11 @@
+# Normalise line endings: LF in the repository and on checkout, on every OS.
+* text=auto eol=lf
+*.svg text eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.avif binary
+*.ico binary
+*.pdf binary

@@ -1,148 +1,104 @@
 # mangalams.blog
 
-Minimal vanilla JS blog app (no build step) with client-side routing and JSON-backed posts.
+A text-first personal blog, built to last. Posts are plain text files and the site is plain static HTML. There are no frameworks and no npm dependencies; Node is only used to build.
 
-## Prerequisites
-
-Use any one of these:
-- Python 3
-- Node.js (for index generation tooling)
-
-## Run Locally
-
-Run from the project root (`mangalamsdotblog`) using an HTTP server.
-
-### Option 1: Python
+## Write a post
 
 ```powershell
-python -m http.server 5500
+npm run new -- "My title"      # creates posts_raw\dd-mm-yyyy-N.txt as a draft
+npm run dev                    # build with drafts + preview at http://localhost:5500
 ```
 
-Then open:
-- http://localhost:5500/
+A post file looks like this:
 
-### Option 2: Node (`serve`)
-
-```powershell
-npx serve -s . -l 5500
-```
-
-Then open:
-- http://localhost:5500/
-
-## Content Authoring Rules
-
-Source of truth:
-- Write raw posts in `posts_raw/`.
-
-Raw post filename format:
-- `dd-mm-yyyy-N.txt`
-- `N` is the post number for that date (1, 2, 3...)
-
-Examples:
-- `22-02-2026-1.txt`
-- `22-02-2026-2.txt`
-
-Raw file format:
 ```txt
-Title: Your title
-Date: 2026-02-22
+Title: My title
+Date: 2026-10-15
+Status: draft
 
-First paragraph.
+First paragraph. Single line breaks
+are joined into one line.
 
 Second paragraph.
 ```
 
-Parsing rules:
-- 2+ blank lines = new paragraph
-- single line breaks inside a paragraph become spaces
-- tabs/multiple spaces are normalized
-- output HTML is escaped and wrapped in `<p>...</p>`
+- **Filename** `dd-mm-yyyy-N.txt` (N = 1, 2, 3… for that day). The filename date is the post's date. `Date:` is optional, and if present must match the filename.
+- **Headers** (before the first blank line): `Title:` (required), `Date:`, `Status: draft` (left out of the published site), `Slug:` (custom URL), `Description:` (custom summary for search engines and link previews).
+- To publish, delete the `Status: draft` line, then commit and push.
 
-## Index Build Tooling (Option 3)
+### Formatting
 
-This project auto-generates index artifacts from post files.
+| Write | Get |
+|---|---|
+| a blank line | new paragraph |
+| `\` at the end of a line | line break (poetry) |
+| `## Heading` / `### Subheading` | headings |
+| `> quoted text` | block quote |
+| `- item` or `1. item` | lists (leave a blank line before) |
+| `[text](https://example.com)` | link (`https://`, `mailto:` or `/site-path` only) |
+| `**bold**`, `*italic*`, `` `code` `` | emphasis, code |
+| `![description](/assets/photo.jpg)` | image (put files in `assets/`) |
+| `---` | horizontal rule |
+| `\*` | a literal `*` |
 
-Generate content JSON from raw source:
-```powershell
-npm run build:content
+Everything else is plain text, and `<`, `>` and `&` are always shown as written.
+
+### URLs are permanent
+
+The first time a post is built, its URL is chosen from the title (`/my-title/`) and recorded in `slugs.json`. After that:
+- Editing the title does **not** change the URL.
+- Adding `Slug: new-url` moves the post. The old URL redirects to the new one.
+- Deleting a post (or setting it back to draft) removes it from the site, but its URL is never given to another post.
+- Titles without Latin letters (e.g. Hindi) get the post id as their URL (`/05-09-2026-1/`). Add `Slug:` for a readable one.
+
+Commit `slugs.json` along with your posts. If you push a post without building first, CI records the URL and commits `slugs.json` for you, so run `git pull` before your next push.
+
+## Other pages
+
+`pages_raw/about.txt` becomes `/about/`. Any other `pages_raw/<name>.txt` becomes `/<name>/` and appears in the menu. It uses the same format, with only `Title:` and `Description:` headers.
+
+## Commands
+
+| Command | What it does |
+|---|---|
+| `npm run new -- "Title"` | new draft for today |
+| `npm run dev` | build including drafts, then serve `dist/` on :5500 |
+| `npm run build` | production build into `dist/` |
+| `npm run serve` | serve the existing `dist/` |
+| `npm test` | run the tests (includes building this repository) |
+
+Requires Node 20 or newer. Nothing to install.
+
+## How it is published
+
+Pushing to `master` runs `.github/workflows/deploy.yml`, which tests, builds and deploys `dist/` to GitHub Pages. `dist/` is never committed.
+
+The site has:
+- `/` latest 10 posts, with older ones loaded as you scroll
+- `/<slug>/` posts
+- `/archive/` every post by year
+- `/about/`
+- `/feed.xml` (Atom), `/sitemap.xml` and `/robots.txt`
+- `404.html`
+
+One-time setup, already required for this to work: repo **Settings → Pages → Build and deployment → Source: GitHub Actions**. The custom domain `mangalams.blog` is set on the same page; DNS is at Hostinger.
+
+## Layout
+
+```
+posts_raw/        posts (source of truth)
+pages_raw/        standalone pages (about)
+assets/           images and files, served at /assets/
+css/style.css     the only stylesheet
+src/feed.js       the only client script (home page infinite scroll)
+scripts/          build.mjs, serve.mjs, new-post.mjs, lib/
+test/             node:test suite
+slugs.json        URL registry: post id -> [current slug, old slugs...]
+site.config.json  title, URL, author, description, page sizes
 ```
 
-Generate index artifacts:
-```powershell
-npm run build:index
-```
+## Direction
 
-Do both:
-```powershell
-npm run build:all
-```
+Text-first, fast, minimal. Inspired by seths.blog, paulgraham.com and nav.al.
 
-Generate only one post:
-```powershell
-node scripts/parse-raw-posts.mjs --file posts_raw\\22-02-2026-1.txt
-```
-
-Generated files:
-- `data/blogIndex.json` (canonical metadata index)
-- `data/blogIndex.meta.json` (page size and totals)
-- `data/blogSlugMap.json` (slug -> post id)
-- `data/blogFeed.<hash>.page.N.json` (paged metadata for infinite scroll)
-
-How app loads data:
-- Home page fetches `blogIndex.meta.json`, then `${pageFilePrefix}.1.json`, then page 2/3/... on scroll.
-- Blog detail page fetches full content only after click via `blogSlugMap.json` + `/data/<id>.json`.
-
-## GitHub Automation
-
-Workflow file:
-- `.github/workflows/build-index.yml`
-
-Behavior:
-- On push to `main` (when raw posts, scripts, data, or `package.json` changes), GitHub Actions runs `npm run build:all`.
-- If generated data files changed, the workflow commits and pushes them.
-
-## Git Push Safety
-
-Commit/push these:
-- `index.html`, `src/`, `css/`, `assets/`
-- `scripts/build-index.mjs`
-- `data/dd-mm-yyyy-N.json` post files
-- generated index artifacts used by the app:
-  - `data/blogIndex.json`
-  - `data/blogIndex.meta.json`
-  - `data/blogSlugMap.json`
-  - `data/blogFeed.<hash>.page.N.json`
-- `.github/workflows/build-index.yml`, `package.json`, `README.md`, `.gitignore`
-
-Do not push (ignored by `.gitignore`):
-- `node_modules/`
-- editor/OS junk (`.vscode/`, `.idea/`, `.DS_Store`, `Thumbs.db`)
-- temp files (`*.tmp`, `*.temp`)
-- legacy unused data:
-  - `data/posts/`
-  - `data/blogIndex.page.*.json`
-  - old-format post files (`data/yyyy-mm-dd-*.json`)
-
-## Important Notes
-
-- Do not open `index.html` directly from the file system (`file://...`). The app loads JSON via `fetch`, which requires HTTP.
-- Start the server from the repository root so paths like `/src/main.js` and `/data/...` resolve correctly.
-- Routing is client-side (`/`, `/about`, and blog slugs). If your server does not support SPA fallback, opening or refreshing deep links directly may return 404.
-
-## Product Direction
-
-Writing style and UX inspiration:
-- seths.blog
-- paulgraham.com
-- nav.al
-
-Target direction:
-- Keep the site text-first, fast, and minimal.
-- Publish thoughtful short/medium essays with simple navigation.
-
-## Hosting Plan
-
-Deployment target:
-- Host as a static site on GitHub (GitHub Pages or equivalent static hosting from the repo).
-- Map your `mangalams.blog` domain from Hostinger to the GitHub-hosted site via DNS.
+MIT licensed.

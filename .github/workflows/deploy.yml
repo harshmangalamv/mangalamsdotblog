@@ -1,0 +1,63 @@
+name: Build and deploy
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+# One deploy at a time; a newer push waits rather than racing an older one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # only to record newly assigned URLs in slugs.json
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
+      - name: Test
+        run: npm test
+
+      - name: Build site
+        run: npm run build
+
+      # A post pushed without a local build gets its URL assigned here.
+      # Record it so the URL stays fixed even if the title changes later.
+      - name: Record new URLs in slugs.json
+        run: |
+          if [ -n "$(git status --porcelain -- slugs.json)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add slugs.json
+            git commit -m "chore: record new post URLs in slugs.json"
+            git pull --rebase origin master && git push origin HEAD:master \
+              || echo "::warning::Could not push slugs.json; run 'npm run build' locally and commit it."
+          fi
+
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

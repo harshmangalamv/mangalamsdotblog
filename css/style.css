@@ -6,9 +6,25 @@
     --bg: #f7f5ef;
     --paper: #fbfaf6;
     --text: #1e1e1b;
+    --body: #37352f;
+    --preview: #3a372f;
     --muted: #6f6a5f;
     --rule: #ded8ca;
+    --quote-rule: #c6bfae;
     --link: #222;
+    --link-underline: #b8b1a4;
+    --focus: #8a6d3b;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 body {
@@ -17,24 +33,29 @@ body {
     color: var(--text);
     font-family: Georgia, "Times New Roman", serif;
     font-size: 19px;
-    height: 100vh;
-    overflow: hidden;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
 }
 
+a:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+    border-radius: 2px;
+}
+
 /* =========================
    GRID LAYOUT
+   The window scrolls (not an inner pane), so Back/Forward, anchors,
+   find-in-page and mobile browsers all behave natively.
 ========================= */
 
 .layout {
     display: grid;
-    grid-template-columns: 260px 1fr;
+    grid-template-columns: 260px minmax(0, 1fr);
     max-width: 1100px;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0 auto;
     padding: 0 24px;
-    box-sizing: border-box;
     gap: 40px;
 }
 
@@ -56,7 +77,18 @@ body {
     letter-spacing: 0.2px;
 }
 
-.menu p {
+.site-title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.menu li {
     margin: 0 0 12px 0;
 }
 
@@ -67,7 +99,8 @@ body {
     letter-spacing: 0.25px;
 }
 
-.menu a:hover {
+.menu a:hover,
+.menu a[aria-current="page"] {
     color: var(--text);
 }
 
@@ -76,16 +109,7 @@ body {
 ========================= */
 
 .content-pane {
-    height: 100%;
-    overflow-y: auto;
-    min-height: 0;
-    -ms-overflow-style: none;  /* IE/Edge legacy */
-    scrollbar-width: none;     /* Firefox */
-}
-
-.content-pane::-webkit-scrollbar {
-    width: 0;
-    height: 0;
+    min-width: 0;
 }
 
 .content {
@@ -94,6 +118,7 @@ body {
     letter-spacing: 0.1px;
     margin-top: 52px;
     padding: 0 0 64px 0;
+    overflow-wrap: break-word;
 }
 
 /* Titles */
@@ -114,14 +139,14 @@ body {
 .content a {
     color: var(--link);
     text-decoration: none;
-    text-decoration-color: #b8b1a4;
+    text-decoration-color: var(--link-underline);
     text-underline-offset: 3px;
     text-decoration-thickness: 1px;
 }
 
 .content a:hover {
     text-decoration: underline;
-    text-decoration-color: #6f6a5f;
+    text-decoration-color: var(--muted);
 }
 
 /* Blog list date style */
@@ -152,7 +177,14 @@ body {
 }
 
 .blog-preview p {
-    color: #3a372f;
+    color: var(--preview);
+}
+
+.feed-end,
+.empty {
+    margin-top: 28px;
+    color: var(--muted);
+    font-size: 16px;
 }
 
 /* single post page */
@@ -162,7 +194,6 @@ body {
 }
 
 .post-title {
-    /* font-family: "Avenir Next", "Segoe UI Variable Text", "Segoe UI", "Helvetica Neue", sans-serif; */
     font-size: 58px;
     font-weight: 800;
     line-height: 1.08;
@@ -180,13 +211,17 @@ body {
 .post .post-body {
     font-size: 20px;
     line-height: 1.48;
-    /* color: #111a24; */
-    color: #37352f;
+    color: var(--body);
     letter-spacing: 0;
 }
 
 .post .post-body p {
     margin: 0 0 18px 0;
+}
+
+/* Body links are underlined so they are visible inside prose. */
+.post .post-body a {
+    text-decoration: underline;
 }
 
 .post .post-body h2,
@@ -197,39 +232,152 @@ body {
     letter-spacing: -0.15px;
 }
 
+.post .post-body h2 {
+    font-size: 28px;
+}
+
+.post .post-body h3 {
+    font-size: 23px;
+}
+
 .post .post-body blockquote {
     margin: 20px 0;
     padding: 4px 0 4px 18px;
-    border-left: 2px solid #c6bfae;
-    color: #37352f;
+    border-left: 2px solid var(--quote-rule);
+    color: var(--body);
     font-style: italic;
 }
 
-@media (max-width: 900px) {
-    body {
-        height: auto;
-        overflow: auto;
-    }
+.post .post-body blockquote p:last-child {
+    margin-bottom: 0;
+}
 
+.post .post-body ul,
+.post .post-body ol {
+    margin: 0 0 18px 0;
+    padding-left: 1.4em;
+}
+
+.post .post-body li {
+    margin: 0 0 6px 0;
+}
+
+.post .post-body code {
+    font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    font-size: 0.85em;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 0 4px;
+}
+
+.post .post-body hr {
+    border: 0;
+    border-top: 1px solid var(--rule);
+    margin: 32px 0;
+}
+
+.post .post-body figure {
+    margin: 24px 0;
+}
+
+.post .post-body img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.post .post-body figcaption {
+    color: var(--muted);
+    font-size: 15px;
+    margin-top: 8px;
+}
+
+/* Older / newer links under a post */
+.post-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    max-width: 600px;
+    margin: -40px 0 64px 0;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    font-size: 16px;
+}
+
+.post-nav .newer {
+    margin-left: auto;
+    text-align: right;
+}
+
+/* Archive */
+.archive-year h2 {
+    font-size: 24px;
+    font-weight: normal;
+    margin: 28px 0 8px 0;
+}
+
+.archive-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.archive-list li {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin: 0 0 6px 0;
+}
+
+.archive-list time {
+    flex: 0 0 4.2em;
+    color: var(--muted);
+    font-size: 15px;
+}
+
+/* Local preview only */
+.draft-banner {
+    margin: 24px 0 0 0;
+    padding: 8px 12px;
+    border: 1px dashed var(--muted);
+    color: var(--muted);
+    font-size: 15px;
+}
+
+@media (max-width: 900px) {
     .layout {
-        grid-template-columns: 1fr;
-        height: auto;
+        grid-template-columns: minmax(0, 1fr);
+        min-height: 0;
         padding: 24px 16px;
         gap: 24px;
     }
 
     .sidebar {
         position: static;
+        padding-top: 0;
     }
 
-    .content-pane {
-        height: auto;
-        overflow: visible;
+    .site-title {
+        margin-bottom: 12px;
+    }
+
+    .menu ul {
+        display: flex;
+        gap: 20px;
+    }
+
+    .menu li {
+        margin: 0;
     }
 
     .content {
         margin-top: 0;
         padding-bottom: 36px;
+    }
+
+    .post {
+        padding-top: 12px;
     }
 
     .blog-preview h2 {

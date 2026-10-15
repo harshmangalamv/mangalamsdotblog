@@ -1,9 +1,16 @@
 {
   "name": "mangalamsdotblog",
   "private": true,
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "build:content": "node scripts/parse-raw-posts.mjs --all",
-    "build:index": "node scripts/build-index.mjs",
-    "build:all": "npm run build:content && npm run build:index"
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/build.mjs --drafts && node scripts/serve.mjs",
+    "serve": "node scripts/serve.mjs",
+    "new": "node scripts/new-post.mjs",
+    "test": "node --test"
   }
 }
