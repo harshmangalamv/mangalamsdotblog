@@ -12,6 +12,7 @@
     "serve": "node scripts/serve.mjs",
     "new": "node scripts/new-post.mjs",
     "test": "node --test",
-    "encode-email": "node scripts/encode-email.mjs"
+    "encode-email": "node scripts/encode-email.mjs",
+    "publish-draft": "node scripts/publish-draft.mjs"
   }
 }

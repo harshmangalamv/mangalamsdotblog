@@ -10,6 +10,7 @@ import { assignSlugs, SlugError } from "../scripts/lib/slugs.mjs";
 import { slugify, formatDateLong, truncateWords, htmlToText } from "../scripts/lib/util.mjs";
 import { build } from "../scripts/build.mjs";
 import { encodeEmail } from "../scripts/encode-email.mjs";
+import { createDraft, publishDraft } from "../scripts/lib/drafts.mjs";
 
 const post = (text, file = "05-09-2026-1.txt") => parsePost(text, file);
 
@@ -408,6 +409,62 @@ test("the email encoder round-trips with the in-browser decoder", async () => {
 test("{{email}} without a configured contact fails the build", async () => {
   const root = await fixture({ "pages_raw/contact.txt": "Title: Contact\n\n{{email}}" });
   await assert.rejects(build({ root, log: () => {} }), /no "contact"/);
+});
+
+test("drafts/ is local-only: previewed with --drafts, ignored by the real build", async () => {
+  const root = await fixture({
+    "posts_raw/01-01-2026-1.txt": "Title: Live\n\nPublished.",
+    "drafts/02-01-2026-1.txt": "Title: Wip\n\nNot yet.",
+    "drafts/03-01-2026-1.txt": "Titel: typo in a half-written draft\n\nBroken.",
+  });
+  // A broken draft never blocks publishing: the production build doesn't read drafts/.
+  await build({ root, log: () => {} });
+  assert.equal(await has(root, "wip/index.html"), false);
+  assert.equal(JSON.parse(await fs.readFile(path.join(root, "slugs.json"), "utf8"))["02-01-2026-1"], undefined);
+  // The preview build reads drafts/ and reports problems in them.
+  await assert.rejects(build({ root, log: () => {}, drafts: true }), /unknown header "Titel:"/);
+  await fs.rm(path.join(root, "drafts/03-01-2026-1.txt"));
+  await build({ root, log: () => {}, drafts: true });
+  assert.match(await read(root, "wip/index.html"), /draft-banner/);
+  assert.equal(JSON.parse(await fs.readFile(path.join(root, "slugs.json"), "utf8"))["02-01-2026-1"], undefined);
+});
+
+test("the same post name in drafts/ and posts_raw/ is an error", async () => {
+  const root = await fixture({ "posts_raw/01-01-2026-1.txt": "Title: A\n\nx", "drafts/01-01-2026-1.txt": "Title: B\n\ny" });
+  await assert.rejects(build({ root, log: () => {}, drafts: true }), /also exists in posts_raw/);
+});
+
+test("new drafts go to drafts/; publishing moves them to posts_raw/ with the publish date", async () => {
+  const root = await fixture({ "posts_raw/18-10-2026-1.txt": "Title: Earlier today\n\nx" });
+  const day = new Date(2026, 9, 18, 21, 0); // 18 Oct 2026, local time
+
+  const file = await createDraft(root, "Lamps", day);
+  assert.equal(path.relative(root, file).replace(/\\/g, "/"), "drafts/18-10-2026-2.txt"); // skips the taken number
+  await fs.writeFile(file, "Title: Lamps\nDate: 2026-10-18\nStatus: draft\nSeries: Light\n\nBody.\n");
+
+  // Published three days later: renamed to that day, Date updated, Status dropped.
+  const dest = await publishDraft(root, "18-10-2026-2", { now: new Date(2026, 9, 21, 9, 0) });
+  assert.equal(path.basename(dest), "21-10-2026-1.txt");
+  assert.equal(await fs.readFile(dest, "utf8"), "Title: Lamps\nDate: 2026-10-21\nSeries: Light\n\nBody.\n");
+  assert.equal(await fs.access(file).then(() => true, () => false), false);
+
+  // --keep-date keeps the draft's own date.
+  const kept = await createDraft(root, "Old idea", day);
+  assert.equal(path.basename(await publishDraft(root, path.basename(kept), { keepDate: true })), "18-10-2026-2.txt");
+
+  // Missing or broken drafts are refused, and a broken draft stays where it is.
+  await assert.rejects(publishDraft(root, "01-01-2030-1"), /No draft named/);
+  await fs.writeFile(path.join(root, "drafts/19-10-2026-1.txt"), "Titel: oops\n\nx");
+  await assert.rejects(publishDraft(root, "19-10-2026-1"), /unknown header/);
+  assert.equal(await fs.access(path.join(root, "drafts/19-10-2026-1.txt")).then(() => true, () => false), true);
+});
+
+test("the example essay in examples/ stays valid", async () => {
+  const text = await fs.readFile(new URL("../examples/long-essay.txt", import.meta.url), "utf8");
+  const post = parsePost(text, "16-10-2026-1.txt");
+  assert.equal(post.draft, true);
+  assert.match(post.content, /<table>/);
+  assert.match(post.content, /class="footnotes"/);
 });
 
 test("build fails loudly on a broken post", async () => {

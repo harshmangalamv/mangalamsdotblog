@@ -117,16 +117,31 @@ async function listSourceFiles(dir) {
   }
 }
 
-export async function readPosts(root) {
-  const dir = path.join(root, "posts_raw");
+// Published posts live in posts_raw/ (tracked by git). Drafts live in drafts/,
+// which is gitignored: they exist only on the writer's machine and are read only
+// for local previews (drafts: true). A broken draft can never block publishing.
+export async function readPosts(root, { drafts = false } = {}) {
+  const sources = [["posts_raw", false]];
+  if (drafts) sources.push(["drafts", true]);
+
   const posts = [];
   const errors = [];
-  for (const file of await listSourceFiles(dir)) {
-    try {
-      posts.push(parsePost(await fs.readFile(path.join(dir, file), "utf8"), file));
-    } catch (err) {
-      if (err instanceof ContentError) errors.push(err.message);
-      else throw err;
+  const seen = new Map();
+  for (const [folder, isDraft] of sources) {
+    const dir = path.join(root, folder);
+    for (const file of await listSourceFiles(dir)) {
+      try {
+        const post = parsePost(await fs.readFile(path.join(dir, file), "utf8"), file);
+        if (isDraft) post.draft = true;
+        if (seen.has(post.id)) {
+          throw new ContentError(`${folder}/${file}: a post named ${post.id} also exists in ${seen.get(post.id)}/. Rename one of them.`);
+        }
+        seen.set(post.id, folder);
+        posts.push(post);
+      } catch (err) {
+        if (err instanceof ContentError) errors.push(err.message);
+        else throw err;
+      }
     }
   }
   if (errors.length) throw new ContentError(errors.join("\n"));

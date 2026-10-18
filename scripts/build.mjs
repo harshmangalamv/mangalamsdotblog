@@ -46,7 +46,7 @@ export async function build({ root = process.cwd(), outDir = path.join(root, "di
   const site = { language: "en", pageSize: 10, feedSize: 20, ...config, url: config.url.replace(/\/+$/, "") };
 
   // ---- content ---------------------------------------------------------
-  const all = await readPosts(root);
+  const all = await readPosts(root, { drafts });
   const pages = await readPages(root);
   const published = all.filter((p) => !p.draft);
   const draftPosts = drafts ? all.filter((p) => p.draft) : [];

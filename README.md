@@ -2,14 +2,15 @@
 
 A text-first personal blog, built to last. Posts are plain text files and the site is plain static HTML. There are no frameworks and no npm dependencies; Node is only used to build.
 
-**Writing?** See [WRITING.md](WRITING.md) for the writer's guide, and `posts_raw/16-10-2026-1.txt` for a draft that uses every feature.
+**Writing?** See [WRITING.md](WRITING.md) for the writer's guide, and `examples/long-essay.txt` for an essay that uses every feature.
 On Windows PowerShell, use `npm.cmd` in place of `npm` if script execution is disabled.
 
 ## Write a post
 
 ```powershell
-npm run new -- "My title"      # creates posts_raw\dd-mm-yyyy-N.txt as a draft
-npm run dev                    # build with drafts + preview at http://localhost:5500
+npm run new -- "My title"            # creates drafts\dd-mm-yyyy-N.txt (local only, gitignored)
+npm run dev                          # build with drafts + preview at http://localhost:5500
+npm run publish-draft -- dd-mm-yyyy-N   # moves it into posts_raw\ with today's date
 ```
 
 A post file looks like this:
@@ -27,7 +28,7 @@ Second paragraph.
 
 - **Filename** `dd-mm-yyyy-N.txt` (N = 1, 2, 3… for that day). The filename date is the post's date. `Date:` is optional, and if present must match the filename.
 - **Headers** (before the first blank line): `Title:` (required), `Date:`, `Status: draft` (left out of the published site), `Slug:` (custom URL), `Description:` (custom summary for search engines and link previews), `Series:` (links essays with the same series name as Part 1, 2, …).
-- To publish, delete the `Status: draft` line, then commit and push.
+- **Drafts** live in `drafts/`, which is gitignored, so unfinished writing never reaches GitHub. `npm run publish-draft` moves a draft into `posts_raw/`; then `npm run build`, commit `posts_raw/` and `slugs.json`, and push. `Status: draft` still works as a safety net for a file in `posts_raw/`.
 
 ### Formatting
 
@@ -85,7 +86,8 @@ Good habits per essay: a specific title, a `Description:` line for anything long
 
 | Command | What it does |
 |---|---|
-| `npm run new -- "Title"` | new draft for today |
+| `npm run new -- "Title"` | new draft for today in `drafts/` |
+| `npm run publish-draft -- <name> [--keep-date]` | move a draft into `posts_raw/` (dated today unless `--keep-date`) |
 | `npm run dev` | build including drafts, then serve `dist/` on :5500 |
 | `npm run build` | production build into `dist/` |
 | `npm run serve` | serve the existing `dist/` |
@@ -111,7 +113,9 @@ One-time setup, already required for this to work: repo **Settings → Pages →
 ## Layout
 
 ```
-posts_raw/        posts (source of truth)
+posts_raw/        published posts (source of truth)
+drafts/           drafts, local only (gitignored)
+examples/         reference essay using every feature (never built)
 pages_raw/        standalone pages (about)
 assets/           images and files, served at /assets/
 css/style.css     the only stylesheet

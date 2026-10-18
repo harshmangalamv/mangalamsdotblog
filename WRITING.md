@@ -1,24 +1,35 @@
 # Writing guide
 
 How to write for mangalams.blog, from a two-line thought to a long, sourced series.
-For a working example of every feature, open `posts_raw/16-10-2026-1.txt` next to its preview (`npm.cmd run dev`, then http://localhost:5500/why-bihar-stayed-poor-1/).
+For a working example of every feature, see `examples/long-essay.txt`. To preview it, copy it to `drafts\16-10-2026-1.txt` and run `npm.cmd run dev`, then open http://localhost:5500/why-bihar-stayed-poor-1/.
 
 ## The loop
 
 ```powershell
-npm.cmd run new -- "Title of the essay"   # creates today's draft in posts_raw\
+npm.cmd run new -- "Title of the essay"   # creates today's draft in drafts\
 npm.cmd run dev                           # preview with drafts at http://localhost:5500
 ```
 
 Write, refresh the browser, repeat. If something is wrong (a missing footnote, an uneven table, a bad link), the build stops and says which file and what to fix.
 
-When it is ready, delete the `Status: draft` line, then commit and push. The site updates in about a minute.
+Drafts live in `drafts\`, which git ignores: they stay on your laptop and never reach GitHub or the site. Back the folder up yourself if it matters (OneDrive, Google Drive, a USB stick).
+
+When an essay is ready:
+
+```powershell
+npm.cmd run publish-draft -- 18-10-2026-1   # moves it to posts_raw\ with today's date
+npm.cmd run build                           # records its permanent URL in slugs.json
+git add posts_raw slugs.json
+git commit -m "New post"
+git push
+```
+
+The post takes the date it is published. Add `--keep-date` to keep the date in the draft's name instead. The site updates about a minute after the push.
 
 ## Header
 
 ```txt
 Title: Why Bihar stayed poor, part 2: land and caste
-Status: draft
 Series: Why Bihar stayed poor
 Slug: why-bihar-stayed-poor-2
 Description: One or two sentences for search results and link previews.
@@ -28,7 +39,7 @@ Description: One or two sentences for search results and link previews.
 |---|---|---|
 | `Title:` | always | The essay's title. |
 | `Date:` | no | Must match the filename date if you include it. |
-| `Status: draft` | while writing | Keeps the essay off the live site. |
+| `Status: draft` | rarely | Keeps a file in `posts_raw/` off the site. Not needed in `drafts/`. |
 | `Series:` | for a series | Essays with exactly the same series name are linked as Part 1, Part 2, … in date order. |
 | `Slug:` | recommended for series | A short, permanent URL. Set it before the first publish; changing it later leaves a redirect behind. |
 | `Description:` | for long essays | What Google, WhatsApp and LinkedIn show. Without it, the opening lines are used. |

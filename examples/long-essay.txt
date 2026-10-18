@@ -6,12 +6,15 @@ Slug: why-bihar-stayed-poor-1
 Description: An example of a long, sourced essay on mangalams.blog. Replace it with the real first part of the series.
 
 <!--
-  EXAMPLE DRAFT. This file shows every feature a long, sourced essay can use.
+  EXAMPLE. This file shows every feature a long, sourced essay can use.
   Everything inside these comment markers is a note to you; it never appears on the site.
-  Preview it with:  npm.cmd run dev   then open http://localhost:5500/why-bihar-stayed-poor-1/
+  It lives in examples/, which the build never reads. To preview it, copy it into drafts/:
+      copy examples\long-essay.txt drafts\16-10-2026-1.txt
+      npm.cmd run dev        then open http://localhost:5500/why-bihar-stayed-poor-1/
 
   The header above:
-    Status: draft       keeps it off the live site. Delete the line to publish.
+    Status: draft       a safety net: even if this file lands in posts_raw/, it stays off the site.
+                        Real drafts don't need it; anything in drafts/ is a draft.
     Series:             posts with the same series name are linked as Part 1, Part 2, ...
     Slug:               a short, permanent URL you choose. Without it the URL comes from the title.
     Description:        what search engines and link previews show. Without it, the opening lines are used.

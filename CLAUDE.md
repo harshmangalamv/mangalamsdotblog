@@ -11,7 +11,7 @@ It is a **static site generator** with zero npm dependencies: Node builds plain 
 ## Mental model
 
 ```
-posts_raw/dd-mm-yyyy-N.txt ─┐
+posts_raw/dd-mm-yyyy-N.txt ─┐   (drafts/ too, only with --drafts)
 pages_raw/<name>.txt ───────┤
 slugs.json (URL registry) ──┼─ scripts/build.mjs ─▶ dist/  (gitignored, deployed by CI)
 site.config.json ───────────┤     index.html                  first 10 previews + /js/feed.js
@@ -36,7 +36,7 @@ Every page is complete HTML, so it works with JS disabled. The only JS is `src/f
 | `scripts/lib/util.mjs` | escape, slugify (ASCII only), UTC date formatting, excerpt truncation |
 | `scripts/serve.mjs` | local server mimicking Pages (301 to trailing slash, 404.html with status 404) |
 | `scripts/encode-email.mjs` / `src/contact.js` | scramble / click-to-reveal email (`{{email}}` in pages_raw only). Same XOR KEY in both |
-| `scripts/new-post.mjs` | `npm run new -- "Title"` → today's draft |
+| `scripts/new-post.mjs` / `scripts/publish-draft.mjs` / `scripts/lib/drafts.mjs` | `npm run new` → `drafts/` (gitignored, local only); `npm run publish-draft -- <name> [--keep-date]` → moves into `posts_raw/` dated today, drops `Status:`, updates `Date:` |
 | `test/build.test.mjs` | node:test: markup, parser, slugs, dates, an end-to-end fixture build, and a build of the real repo |
 | `.github/workflows/deploy.yml` | push to master → test → build → commit slugs.json if new → upload → deploy |
 | `css/style.css` | one stylesheet, token-based (`:root` vars; dark values under `prefers-color-scheme`). One centred reading column (`--measure` 36rem), header + footer, print styles |
@@ -45,7 +45,8 @@ Every page is complete HTML, so it works with JS disabled. The only JS is `src/f
 
 Filename `dd-mm-yyyy-N.txt`. The filename date is the source of truth. Header lines `Key: value` run until the first blank line or the first line that is not a `Key:` line.
 Keys: `Title` (required), `Date` (optional, must equal the filename date), `Status` (`published`|`draft`), `Slug`, `Description`, `Series`. Unknown keys fail the build.
-Body syntax: README.md › Formatting. Writer-facing guide: WRITING.md. Live example of every feature: `posts_raw/16-10-2026-1.txt` (a draft; never published).
+Body syntax: README.md › Formatting. Writer-facing guide: WRITING.md. Example of every feature: `examples/long-essay.txt` (never built; a test keeps it valid).
+Drafts: `drafts/` is gitignored and read only by `build --drafts`; a broken draft can't block a deploy. Never commit drafts; never add `drafts/` back to git.
 Markup extras: footnotes `[^id]` + `[^id]: …` (strict: missing/unused/duplicate fail), pipe tables (strict cell counts), `<!-- comments -->` stripped. Series = posts sharing a `Series:` name, ordered by date. Contents list when a post has ≥4 `##`. Page-owned ids (main, notes, series, toc-label, …) are reserved from heading ids.
 
 ## Invariants (do not break)
@@ -85,17 +86,17 @@ Markup extras: footnotes `[^id]` + `[^id]: …` (strict: missing/unused/duplicat
 
 - If CI assigns a URL (a post pushed without a local build), it commits `slugs.json`. Run `git pull` before the next push.
 
-## Status (2026-10-16)
+## Status (2026-10-18)
 
-- Published: "Ail Ail Aimshh" → `/ail-ail-aimshh/`, "the flickering lamp" → `/the-flickering-lamp/`, About page (no employer named, by request).
+- Published: "Explosion" (2022-03-28) and "Moon" (2022-04-30), both moved from his old Blogspot (hmangalams.blogspot.com); "Ail Ail Aimshh"; "the flickering lamp"; About page (no employer named, by request).
+- Decided 2026-10-18: repo stays public; drafts kept out of git in `drafts/`.
 - Live: design refresh (Neel background, no logo yet), long-essay toolkit, search-engine groundwork, content controls.
 
 ## REMIND HARSH at the start of the next session (he asked; remove items once done)
 
 1. One-time search setup (see "Search engines" above): Google Search Console (domain TXT at Hostinger, submit sitemap, request indexing of / and /about/), Bing Webmaster Tools import, GitHub profile Website → https://mangalams.blog, LinkedIn website + Featured.
-2. Decide: the GitHub repo is public, so drafts in posts_raw/ and the full text are readable on GitHub regardless of robots.txt. Options: keep public; GitHub Pro ($4/mo) to make it private and keep Pages; or keep drafts out of git.
-3. His public commits carry his Gmail address as author. Fix: GitHub Settings → Emails → "Keep my email addresses private" + "Block command line pushes that expose my email", then `git config --global user.email <id>+harshmangalamv@users.noreply.github.com`.
-4. Optional: Cloudflare (free) in front of the site for hard AI-bot blocking ("Block AI bots" toggle); needs nameservers moved from Hostinger to Cloudflare.
+2. His public commits carry his Gmail address as author. Fix: GitHub Settings → Emails → "Keep my email addresses private" + "Block command line pushes that expose my email", then `git config --global user.email <id>+harshmangalamv@users.noreply.github.com`.
+3. Optional: Cloudflare (free) in front of the site for hard AI-bot blocking ("Block AI bots" toggle); needs nameservers moved from Hostinger to Cloudflare.
 - Planned: a fact-backed series on why Bihar remains poor. Links (`[text](https://…)`) are supported for citations.
 - Remaining ideas: REVIEW.md.
 

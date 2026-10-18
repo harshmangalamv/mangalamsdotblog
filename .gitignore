@@ -1,6 +1,9 @@
 # Build output (deployed by GitHub Actions, never committed)
 dist/
 
+# Drafts stay on this machine only; publishing moves a file into posts_raw/
+drafts/
+
 # Dependencies
 node_modules/
 
