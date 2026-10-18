@@ -3,6 +3,7 @@
 
 import { escapeHtml as e, formatDateLong } from "./util.mjs";
 import { jsonLd } from "./seo.mjs";
+import { renderInline } from "./markup.mjs";
 
 // The site's mark, shown beside the name. Empty for now: the logo is being designed.
 // To add it later, set this to an inline <svg class="mark" aria-hidden="true">…</svg>
@@ -78,9 +79,12 @@ export function layout(site, page) {
     <a class="site-name" href="/"${homeAria}>${MARK}<span>${e(site.title)}</span></a>
     <nav aria-label="Site"><ul>${nav}</ul></nav>
   </header>
-  <main id="main">
+  <div class="frame">
+    <main id="main">
 ${body}
-  </main>
+    </main>
+${sidebar(site, path)}
+  </div>
   <footer class="site-footer">
     <p>© ${site.since && site.since < new Date().getUTCFullYear() ? `${site.since}–` : ""}${new Date().getUTCFullYear()} ${e(site.author)}. <a href="/feed.xml">Subscribe with RSS</a></p>
   </footer>
@@ -284,4 +288,61 @@ export function robots(site) {
   }
   lines.push(`Sitemap: ${site.url}/sitemap.xml`, "");
   return lines.join("\n");
+}
+
+// The second column: a short hello, blogs worth reading, and every essay by year.
+// Beside the essay on wide screens; below it on phones. Built from site.config.json
+// ("sidebar") and the published posts (site.sidebarPosts).
+export function sidebar(site, path) {
+  const cfg = site.sidebar || {};
+  const posts = site.sidebarPosts || [];
+  const blocks = [];
+
+  if (cfg.intro) {
+    const more = site.aboutUrl ? `\n        <p><a href="/about/">More about me</a></p>` : "";
+    blocks.push(`      <section aria-labelledby="side-hi">
+        <h2 id="side-hi">Hi</h2>
+        <p>${renderInline(cfg.intro)}</p>${more}
+      </section>`);
+  }
+
+  if (cfg.blogroll?.length) {
+    const items = cfg.blogroll.map((b) => `<li><a href="${e(b.url)}" rel="noopener">${e(b.name)}</a></li>`).join("");
+    blocks.push(`      <section aria-labelledby="side-reading">
+        <h2 id="side-reading">Blogs I read</h2>
+        <ul>${items}</ul>
+      </section>`);
+  }
+
+  if (posts.length) {
+    const years = new Map();
+    for (const p of posts) {
+      const y = p.date.slice(0, 4);
+      if (!years.has(y)) years.set(y, []);
+      years.get(y).push(p);
+    }
+    const currentPost = posts.find((p) => path === `/${p.slug}/`);
+    const openYear = currentPost ? currentPost.date.slice(0, 4) : [...years.keys()][0];
+    const groups = [...years]
+      .map(([year, list]) => {
+        const items = list
+          .map((p) => {
+            const here = currentPost === p ? ' aria-current="page"' : "";
+            return `<li><a href="/${e(p.slug)}/"${here}>${e(p.title)}</a></li>`;
+          })
+          .join("");
+        const open = year === openYear ? " open" : "";
+        return `        <details${open}><summary>${e(year)} <span class="count">(${list.length})</span></summary><ul>${items}</ul></details>`;
+      })
+      .join("\n");
+    blocks.push(`      <section aria-labelledby="side-archive">
+        <h2 id="side-archive">Archive</h2>
+${groups}
+      </section>`);
+  }
+
+  if (!blocks.length) return "";
+  return `    <aside class="sidebar" aria-label="About this blog">
+${blocks.join("\n")}
+    </aside>`;
 }

@@ -26,6 +26,8 @@
     --text-size: clamp(1.0625rem, 0.98rem + 0.35vw, 1.1875rem); /* 17px phone -> 19px desktop */
     --measure: 36rem;
     --gutter: 1.25rem;
+    --side: 15rem;      /* second column */
+    --side-gap: 4.5rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -119,12 +121,121 @@ a:focus-visible {
    FRAME: header, column, footer
 ========================= */
 
+/* One column on phones and tablets; essay + sidebar from 64rem (1024px) up.
+   The essay column keeps its reading width either way. */
 .site-header,
-main,
+.frame,
 .site-footer {
     max-width: calc(var(--measure) + 2 * var(--gutter));
     margin-inline: auto;
     padding-inline: var(--gutter);
+}
+
+.frame {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+}
+
+main {
+    min-width: 0;
+}
+
+@media (min-width: 64rem) {
+    .site-header,
+    .frame,
+    .site-footer {
+        max-width: calc(var(--measure) + var(--side-gap) + var(--side) + 2 * var(--gutter));
+    }
+
+    .frame {
+        grid-template-columns: minmax(0, var(--measure)) var(--side);
+        column-gap: var(--side-gap);
+        align-items: start;
+    }
+}
+
+/* =========================
+   SIDEBAR: hello, blogs I read, archive by year
+========================= */
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--rule);
+    color: var(--body);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+}
+
+@media (min-width: 64rem) {
+    .sidebar {
+        margin-top: 0;
+        padding-top: 0.35rem; /* lines up with the first title */
+        border-top: 0;
+    }
+}
+
+.sidebar h2 {
+    margin: 0 0 0.5rem 0;
+    color: var(--muted);
+    font-size: 0.875rem;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+}
+
+.sidebar p {
+    margin: 0 0 0.5rem 0;
+}
+
+.sidebar ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.sidebar li + li {
+    margin-top: 0.3rem;
+}
+
+.sidebar a {
+    color: var(--link);
+    text-decoration: none;
+}
+
+.sidebar a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+}
+
+.sidebar a[aria-current="page"] {
+    color: var(--ink);
+    font-weight: 700;
+}
+
+.sidebar details + details {
+    margin-top: 0.35rem;
+}
+
+.sidebar summary {
+    color: var(--ink);
+    cursor: pointer;
+}
+
+.sidebar summary .count {
+    color: var(--muted);
+}
+
+.sidebar details ul {
+    margin: 0.4rem 0 0.6rem 1.1rem;
+}
+
+.sidebar summary:focus-visible {
+    outline: 2px solid var(--link);
+    outline-offset: 3px;
+    border-radius: 2px;
 }
 
 .site-header {
@@ -689,6 +800,7 @@ main,
     }
 
     .site-header nav,
+    .sidebar,
     .site-footer,
     .post-nav,
     .feed-end,

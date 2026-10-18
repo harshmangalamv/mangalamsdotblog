@@ -52,5 +52,22 @@
       "/archive/",
       "/about/"
     ]
+  },
+  "sidebar": {
+    "intro": "The views are mine. If you find these good enough, you may talk more about them with anyone! You can choose to correct me, and I won't be offended. Thanks for standing by. Wish you strength. Live up!",
+    "blogroll": [
+      {
+        "name": "Naval",
+        "url": "https://nav.al/"
+      },
+      {
+        "name": "Seth Godin",
+        "url": "https://seths.blog/"
+      },
+      {
+        "name": "Farnam Street",
+        "url": "https://fs.blog/"
+      }
+    ]
   }
 }

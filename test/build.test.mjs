@@ -276,7 +276,8 @@ test("full build: pages, feed, drafts, redirects, unpublishing", async () => {
   const home = await read(root, "index.html");
   assert.match(home, /data-pages="2"/);
   assert.ok(home.indexOf("/three/") < home.indexOf("/second/"));
-  assert.doesNotMatch(home, /old-one/);
+  const feedPart = home.slice(home.indexOf('<div id="feed"'), home.indexOf("</main>"));
+  assert.doesNotMatch(feedPart, /old-one/); // page 1 of the feed holds 2 posts here
   const [page2] = (await fs.readdir(path.join(root, "dist", "data"))).filter((f) => f.endsWith(".2.json"));
   assert.match(JSON.parse(await read(root, `data/${page2}`)).items[0], /\/old-one\//);
 
@@ -465,6 +466,34 @@ test("the example essay in examples/ stays valid", async () => {
   assert.equal(post.draft, true);
   assert.match(post.content, /<table>/);
   assert.match(post.content, /class="footnotes"/);
+});
+
+test("sidebar: hello, blogs I read, archive by year with the current post marked", async () => {
+  const root = await fixture({
+    "site.config.json": JSON.stringify({
+      title: "t.blog", url: "https://t.blog", author: "A", description: "D",
+      sidebar: { intro: "Views are *mine* <b>.", blogroll: [{ name: "Naval", url: "https://nav.al/" }] },
+    }),
+    "posts_raw/01-01-2025-1.txt": "Title: Old\n\nx",
+    "posts_raw/01-01-2026-1.txt": "Title: New\n\ny",
+    "posts_raw/02-01-2026-1.txt": "Title: Newer\n\nz",
+    "drafts/03-01-2026-1.txt": "Title: Secret draft\n\nw",
+  });
+  await build({ root, log: () => {}, drafts: true });
+
+  const home = await read(root, "index.html");
+  // after the essay column in the page, so phones show it below the essay
+  assert.ok(home.indexOf("</main>") < home.indexOf('<aside class="sidebar"'));
+  assert.match(home, /<h2 id="side-hi">Hi<\/h2>\s*<p>Views are <em>mine<\/em> &lt;b&gt;\.<\/p>\s*<p><a href="\/about\/">More about me<\/a><\/p>/);
+  assert.match(home, /<li><a href="https:\/\/nav\.al\/" rel="noopener">Naval<\/a><\/li>/);
+  assert.match(home, /<details open><summary>2026 <span class="count">\(2\)<\/span><\/summary>/);
+  assert.match(home, /<details><summary>2025 <span class="count">\(1\)<\/span><\/summary>/);
+  assert.doesNotMatch(home.slice(home.indexOf("<aside")), /Secret draft/); // drafts never listed
+
+  // On a post, its year is open and the post is marked as the current page.
+  const old = await read(root, "old/index.html");
+  assert.match(old, /<details open><summary>2025/);
+  assert.match(old, /<a href="\/old\/" aria-current="page">Old<\/a>/);
 });
 
 test("build fails loudly on a broken post", async () => {

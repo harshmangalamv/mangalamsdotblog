@@ -113,6 +113,9 @@ export async function build({ root = process.cwd(), outDir = path.join(root, "di
 
   if (pages.about) site.aboutUrl = `${site.url}/about/`;
 
+  // Sidebar archive lists published essays only (never drafts), newest first.
+  site.sidebarPosts = posts.filter((p) => !p.draft);
+
   site.nav = [
     { key: "home", label: "Home", href: "/" },
     { key: "archive", label: "Archive", href: "/archive/" },

@@ -78,6 +78,13 @@ Good habits per essay: a specific title, a `Description:` line for anything long
 - **Email**: never written in any file or page. `site.config.json` → `contact` holds a scrambled copy (`npm run encode-email -- you@example.com`); `{{email}}` in a page shows a "Show email address" button that assembles it in the reader's browser.
 - Limits: robots.txt is a request the major AI companies honour, not a lock. Hard blocking needs a proxy such as Cloudflare in front of the site.
 
+## Sidebar
+
+The second column (beside essays on wide screens, below them on phones) is set in `site.config.json` → `sidebar`:
+- `intro`: the short hello (inline formatting allowed: `*italic*`, `[link](https://…)`).
+- `blogroll`: a list of `{ "name": …, "url": … }` for "Blogs I read".
+The archive by year is built automatically from published posts.
+
 ## Other pages
 
 `pages_raw/about.txt` becomes `/about/`. Any other `pages_raw/<name>.txt` becomes `/<name>/` and appears in the menu. It uses the same format, with only `Title:` and `Description:` headers.
