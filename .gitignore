@@ -4,6 +4,12 @@ dist/
 # Drafts stay on this machine only; publishing moves a file into posts_raw/
 drafts/
 
+# Private notes: personal status, reminders, reviews. Never public.
+CLAUDE.local.md
+NOTES.md
+REVIEW.md
+*.private.md
+
 # Dependencies
 node_modules/
 

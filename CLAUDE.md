@@ -1,10 +1,9 @@
 # mangalams.blog — knowledge store
 
-Harsh's personal blog, meant to run for life. Text-first and minimal (seths.blog, paulgraham.com, nav.al).
+A personal blog, meant to run for life. Text-first and minimal (seths.blog, paulgraham.com, nav.al).
 It is a **static site generator** with zero npm dependencies: Node builds plain HTML into `dist/`, and GitHub Actions deploys it to Pages.
 
 - Repo: github.com/harshmangalamv/mangalamsdotblog · branch **`master`** (not main)
-- Local: `D:\Projects\mangalamsdotblog` (Windows; keep all tooling on D:)
 - Hosting: GitHub Pages with **Source: GitHub Actions**. Custom domain `mangalams.blog` (CNAME); DNS at Hostinger
 - License: MIT. Requires Node ≥ 20 (CI uses 24)
 
@@ -57,13 +56,13 @@ Markup extras: footnotes `[^id]` + `[^id]: …` (strict: missing/unused/duplicat
 4. **Fail loudly.** Bad filenames, date mismatches, unknown headers, unsafe links and slug clashes stop the build.
 5. **The Atom `<id>` is `tag:<host>,<date>:<post id>`**, so it is stable even if the slug changes. Never change this format.
 6. **Stay dependency-free and static.** Prefer build-time work over runtime JS.
-7. **Never write Harsh's email in plain text** anywhere (repo files, pages, feed, JSON-LD, commit messages). Only the scrambled `contact` value + `{{email}}`.
-8. **Content control**: essays are © all rights reserved (LICENSE); AI training crawlers fully disallowed, AI answer/user fetchers limited to `/`, `/archive/`, `/about/` (config → robots.txt); TDM opt-out via `/.well-known/tdmrep.json` (workflow uploads hidden files) + meta. Don't loosen without Harsh asking.
+7. **Never write the owner's email in plain text** anywhere (repo files, pages, feed, JSON-LD, commit messages). Only the scrambled `contact` value + `{{email}}`.
+8. **Content control**: essays are © all rights reserved (LICENSE); AI training crawlers fully disallowed, AI answer/user fetchers limited to `/`, `/archive/`, `/about/` (config → robots.txt); TDM opt-out via `/.well-known/tdmrep.json` (workflow uploads hidden files) + meta. Don't loosen without the owner asking.
 9. Reserved top-level names: archive, assets, css, data, js, feed, rss, atom, page, tag, tags, search, 404, index, plus every `pages_raw` name.
 
 ## Design system ("ink by day, lamplight by night")
 
-- No logo yet (Harsh is designing one). `MARK` in templates.mjs is the empty slot beside the site name; `favicon.svg` is a placeholder "m". Essays end in plain space. Don't add decoration.
+- No logo yet (one is being designed). `MARK` in templates.mjs is the empty slot beside the site name; `favicon.svg` is a placeholder "m". Essays end in plain space. Don't add decoration.
 - Background "Neel" (pale indigo; a nod to Champaran's indigo and the 1917 satyagraha in Bihar). Day: paper `#eceaf3`, ink `#1b1a2b`, links indigo `#2f3592`. Night (automatic, follows the reader's OS/browser theme): paper `#14142a`, ink `#ebe8f5`, links amber `#e9b765`. All text/link/muted pairs pass WCAG AA.
 - Type: system serif stack (Charter / Sitka Text / Georgia...), no web fonts. Body 17→19px, line-height 1.65, ~65ch measure.
 - Wordmark (site name, top left): 22→28px regular weight, always smaller than essay titles (32→42px bold). Nav links stay 15px muted.
@@ -75,7 +74,7 @@ Markup extras: footnotes `[^id]` + `[^id]: …` (strict: missing/unused/duplicat
 ## Search engines
 
 - Goal: the blog ranks for "Harsh Mangalam Verma" and for its essay topics. Identity = Person JSON-LD + `rel="me"` + name in home/About titles + reciprocal links from GitHub/LinkedIn.
-- Manual setup Harsh does once (cannot be automated from the repo):
+- Manual setup the owner does once (cannot be automated from the repo):
   1. Google Search Console → add *Domain* property `mangalams.blog` → add the TXT record at Hostinger DNS → verify → Sitemaps → submit `https://mangalams.blog/sitemap.xml` → URL inspection → request indexing for `/` and `/about/`.
   2. Bing Webmaster Tools → import from Search Console (also feeds DuckDuckGo, Yahoo, ChatGPT search).
   3. GitHub profile "Website" → `https://mangalams.blog`; LinkedIn → Contact info → Website + a Featured link.
@@ -86,22 +85,9 @@ Markup extras: footnotes `[^id]` + `[^id]: …` (strict: missing/unused/duplicat
 
 - If CI assigns a URL (a post pushed without a local build), it commits `slugs.json`. Run `git pull` before the next push.
 
-## Status (2026-10-18)
-
-- Published: 11 posts. Nine moved from his old Blogspot (hmangalams.blogspot.com) with original dates, text unchanged, source URL kept in a comment in each file: Conflict, Compounding (Oct 2021), Easy Tasks! (Nov 2021), You are being programmed!, Present, Free Trial (Jan–Feb 2022), Explosion, Moon, Games (Mar–May 2022). Plus "Ail Ail Aimshh", "the flickering lamp", and the About page (no employer named, by request).
-- 2026-10-19, at Harsh's request: Compounding now says the quote is "often attributed to" Einstein, with a footnote citing Quote Investigator; spelling fixed in Games, Present, Easy Tasks! (each file notes its edit in a comment). Otherwise the old posts stay as written.
-- Decided 2026-10-18: repo stays public; drafts kept out of git in `drafts/`.
-- Live: design refresh (Neel background, no logo yet), long-essay toolkit, search-engine groundwork, content controls.
-
-## REMIND HARSH at the start of the next session (he asked; remove items once done)
-
-1. One-time search setup (see "Search engines" above): Google Search Console (domain TXT at Hostinger, submit sitemap, request indexing of / and /about/), Bing Webmaster Tools import, GitHub profile Website → https://mangalams.blog, LinkedIn website + Featured.
-2. His public commits carry his Gmail address as author. Fix: GitHub Settings → Emails → "Keep my email addresses private" + "Block command line pushes that expose my email", then `git config --global user.email <id>+harshmangalamv@users.noreply.github.com`.
-3. Optional: Cloudflare (free) in front of the site for hard AI-bot blocking ("Block AI bots" toggle); needs nameservers moved from Hostinger to Cloudflare.
-- Planned: a fact-backed series on why Bihar remains poor. Links (`[text](https://…)`) are supported for citations.
-- Remaining ideas: REVIEW.md.
-
 ## Working rules for Claude
+
+- **Private notes live outside this public repo**, in the Claude Project doc `claude/NOTES.md` (status, decisions, reminders) and `claude/REVIEW.md`. Read NOTES.md at the start of a session; write personal or status information there, never here. Anything committed to this repo is public.
 
 - Run `npm test` after any change. Add a test for any new syntax or rule.
 - Never commit `dist/`. Never hand-edit `slugs.json` except to fix a mistake, and keep old slugs.
