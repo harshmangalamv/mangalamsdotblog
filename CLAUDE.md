@@ -65,7 +65,7 @@ Markup extras: footnotes `[^id]` + `[^id]: …` (strict: missing/unused/duplicat
 - No logo yet (one is being designed). `MARK` in templates.mjs is the empty slot beside the site name; `favicon.svg` is a placeholder "m". Essays end in plain space. Don't add decoration.
 - Background "Neel" (pale indigo; a nod to Champaran's indigo and the 1917 satyagraha in Bihar). Day: paper `#eceaf3`, ink `#1b1a2b`, links indigo `#2f3592`. Night (automatic, follows the reader's OS/browser theme): paper `#14142a`, ink `#ebe8f5`, links amber `#e9b765`. All text/link/muted pairs pass WCAG AA.
 - Type: system serif stack (Charter / Sitka Text / Georgia...), no web fonts. Body 17→19px, line-height 1.65, ~65ch measure.
-- Two columns (Harsh's choice, echoing his old Blogspot): sidebar on every page with "Hi" (his own intro words), "Blogs I read" and an archive by year (`<details>`, current post's year open, current post bold; drafts never listed). Content comes from `site.config.json` → `sidebar`. Muted small headings, no boxes.
+- Two columns (echoing the old Blogspot layout): sidebar on every page with "Hi" (the owner's own intro words), "Blogs I read" and an archive by year (`<details>`, current post's year open, current post bold; drafts never listed). Content comes from `site.config.json` → `sidebar`. Muted small headings, no boxes.
 - Wordmark (site name, top left): 22→28px regular weight, always smaller than essay titles (32→42px bold). Nav links stay 15px muted.
 - No all-caps labels, no `→` arrows, no cards or shadows. Structure comes from whitespace; hairline rules only where they separate the essay from navigation.
 - Section headings get ids and link to themselves; links/footnotes inside headings are rejected by the build.
