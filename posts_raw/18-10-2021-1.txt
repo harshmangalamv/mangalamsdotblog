@@ -2,8 +2,9 @@ Title: Compounding
 Date: 2021-10-18
 
 <!-- First published on Blogspot: https://hmangalams.blogspot.com/2021/10/compounding.html -->
+<!-- 2026-10-19: Einstein quote marked as attributed, with a note on its origin. -->
 
-Albert Einstein said once, "Compound interest is the eighth wonder of the world. He who understands it, earns it … he who doesn't … pays it." Compounding plays so much important role invisibly, in sense of short term, that we often fail to recognize it.
+A line often attributed to Albert Einstein says, "Compound interest is the eighth wonder of the world. He who understands it, earns it … he who doesn't … pays it."[^einstein] Compounding plays so much important role invisibly, in sense of short term, that we often fail to recognize it.
 
 Compounding in knowledge is apparent in "(S)he who aspires wisdom, achieves it." Learning little things continuously for longer times do compound. Every thing that's learned previously helps (and adds) in learning new things. Who can read a passage easily without learning the alphabets?
 
@@ -16,3 +17,5 @@ Positive attitude, doing good, and speaking truth require (little) conscious eff
 Humans (the receivers of some of our actions) are emotional beings - they always remember how we made them feel, mostly unconsciously. So next time they interact with you, they'll seek the cue (on how to act next) and simultaneously act according to past interactions.
 
 Ending with what Naval says, "Compound interest also happens in your reputation. If you have a sterling reputation and you keep building it for decades upon decades, people will notice. Your reputation will literally end up being thousands or tens of thousands of times more valuable than somebody else who was very talented but is not keeping the compound interest in reputation going."
+
+[^einstein]: There is no evidence that Einstein said this. [Quote Investigator](https://quoteinvestigator.com/2019/09/09/interest/) finds the line credited to many people, from Baron Rothschild to John D. Rockefeller, and in a [related investigation](https://quoteinvestigator.com/2011/10/31/compound-interest/) calls an Einstein origin "very unlikely".
