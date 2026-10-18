@@ -88,7 +88,8 @@ Markup extras: footnotes `[^id]` + `[^id]: …` (strict: missing/unused/duplicat
 
 ## Status (2026-10-18)
 
-- Published: "Explosion" (2022-03-28) and "Moon" (2022-04-30), both moved from his old Blogspot (hmangalams.blogspot.com); "Ail Ail Aimshh"; "the flickering lamp"; About page (no employer named, by request).
+- Published: 11 posts. Nine moved from his old Blogspot (hmangalams.blogspot.com) with original dates, text unchanged, source URL kept in a comment in each file: Conflict, Compounding (Oct 2021), Easy Tasks! (Nov 2021), You are being programmed!, Present, Free Trial (Jan–Feb 2022), Explosion, Moon, Games (Mar–May 2022). Plus "Ail Ail Aimshh", "the flickering lamp", and the About page (no employer named, by request).
+- Open question for Harsh: Compounding attributes the "eighth wonder" quote to Einstein (widely considered misattributed); a few typos in the old posts (devise, fair, opposed). Left as written until he decides.
 - Decided 2026-10-18: repo stays public; drafts kept out of git in `drafts/`.
 - Live: design refresh (Neel background, no logo yet), long-essay toolkit, search-engine groundwork, content controls.
 
