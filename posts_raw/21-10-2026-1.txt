@@ -1,0 +1,96 @@
+Title: Is consciousness a stateless service?
+Slug: is-consciousness-a-stateless-service
+Description: I build stateless services for a living, so I treated the idea that a moment of consciousness works like one as a hypothesis. It turns out to depend on where you draw the box.
+
+I spend my working days building services that forget. A request arrives with the context it needs; the service processes it, returns a response, and retains nothing from that request. Anything that must survive is stored elsewhere. The next request starts clean.
+
+A few weeks ago, one thought kept returning: what if a moment of consciousness works in a similar way? Each moment could be a fresh computation, supplied with context from elsewhere. Memory would persist beyond the computation that uses it. The idea seemed to offer a way to think about continuity: why I wake up feeling like the same person after a night without ordinary waking experience, and why a language model can sustain a conversation even when its individual calls do not retain state between them.
+
+I did not want to stop at an appealing metaphor. I wanted to treat it as an architectural hypothesis: identify the parts, ask where state lives, and see what the model predicts. This is the first round of that investigation.[^repo]
+
+## The metaphor is old; the questions are not
+
+My first surprise was that I was late. Since the 1980s, people have described the mind as an operating system, a virtual machine, or a shared blackboard that many processes can write to.[^old] Comparing the brain with whatever computer happens to be fashionable is a tradition, not a discovery.
+
+What I could not find was the kind of discipline engineers bring to a system they build. For each component, what state does it hold, for how long, and where is that state stored? What happens when some of it is lost? Applied to theories of consciousness, these questions lead to different answers, but those answers are rarely laid out side by side in the same architectural vocabulary. That is where I think this project may be useful: not in claiming that the brain is software, but in making assumptions about persistence, processing, and coordination easier to compare.
+
+## Stateless does not mean empty
+
+The second lesson was about my own terminology. A stateless service is not a service without state. While handling a request, it is full of state: variables, a call stack, and unfinished results. Its code and configuration persist too. Stateless means only that it carries no session state from one request to the next; any required context must be supplied again or retrieved from elsewhere.
+
+That distinction matters because the brain plainly has state within a moment. Perception is not a single pass. In masking experiments, a stimulus can become invisible when feedback loops in the brain are disrupted, even though the initial forward sweep of activity remains intact. What we perceive at one instant can also depend on information arriving a few hundred milliseconds later. A mind with no state even within a moment is therefore not the model I am proposing.
+
+The question splits in two. Within a moment, is processing a single pass or a recurrent loop? Across moments, where does the past live—nowhere, in a separate store, or in the ongoing process itself?
+
+## Stateless or stateful depends on where you draw the box
+
+The third lesson changed how I think about the whole question, and it comes straight from my work.
+
+A process that keeps state can often be rewritten as a stateless step plus a store. Take the state out, pass it in with each call, and save the result afterward. Web developers do this to place a stateful session behind a stateless server. If the full state is transferred correctly, the behaviour need not change at all.
+
+I wrote a small experiment to test this with two simple systems whose state is fully known: a delay line that outputs what it saw eight steps earlier, and a running average.[^exp] When the full state is passed across each boundary, the stateless version matches the stateful one exactly: agreement 1.000; error 0.000. The state was moved, not removed.
+
+So stateless is not an absolute property of a computation. It depends on where the system boundary is drawn and what crosses it. The brain presents the same ambiguity: some working memory may be maintained by short-term changes at synapses rather than by ongoing neural activity.[^synapse] Draw the boundary around the activity and that memory appears to be outside. Draw it around the tissue and it is inside.
+
+If that were the end of the story, the stateless idea would amount to relabelling. Moving state across an architectural boundary does not, by itself, explain consciousness.
+
+## Where the idea earns its keep: lossy handoffs
+
+The hypothesis becomes more interesting when the handoff is imperfect. Suppose only part of the state passes from one moment to the next. Then the model makes a specific prediction: some forgetting should cluster at the boundaries between episodes, rather than simply accumulating with elapsed time.
+
+The experiment shows that pattern clearly. With episodes of 20 steps and only part of the delay line's state carried forward, every error occurred immediately after a boundary. The number of errors corresponded to the state that had failed to cross:
+
+| Handoff (episodes of 20 steps) | Share of state carried | Agreement |
+|---|--:|--:|
+| Everything | 100% | 1.000 |
+| Newest 4 of 8 slots | 50% | 0.810 |
+| Newest 1 of 8 slots | 12% | 0.667 |
+| Nothing | 0% | 0.620 |
+
+How often the handoff happens matters, too. Performing the same lossy handoff at every step, rather than every 20 steps, reduced agreement to 0.020. For the running average, rounding at every step produced an error of 0.274; rounding only at episode boundaries produced an error of 0.040. Fewer reconstructions meant less accumulated loss in these experiments.
+
+A simple model in which memory merely decays with time would predict a different pattern: loss should track elapsed time, not depend so strongly on where boundaries fall. This experiment does not show that consciousness actually works this way. It shows that boundary-sensitive loss is a measurable prediction of this particular architecture.
+
+There is a suggestive human parallel. In one well-known study, walking through a doorway caused people to forget recently handled objects more often than walking the same distance within a room.[^doorway] Large changes in a scene can also go unnoticed across a brief cut or flicker,[^change] as though some general context survives while details do not. I would not lean on these findings too heavily: they concern memory, not conscious experience, and other explanations remain possible. But they suggest a useful experiment—hold elapsed time constant, vary the number of boundaries, and test which variable better predicts forgetting.
+
+## What the evidence seems to favour
+
+Taken together, the evidence points toward a hybrid picture. Within a moment, processing is recurrent; across longer stretches, some form of persistence carries forward what survives. This is not a verdict on consciousness as a whole. It is a provisional architectural picture of how moment-to-moment processing and continuity might fit together.
+
+The slow end of the picture is the clearest. During dreamless sleep, the cortex's ability to transmit activity effectively between regions breaks down,[^sleep] yet the person wakes up with a continuing sense of identity. That suggests identity does not require an uninterrupted stream of ordinary conscious experience; it can also depend on enduring structure and stored dispositions. At the other end, people with profound amnesia can remain conscious from moment to moment. One professional musician retained musical skill and awareness while forming almost no new memories.[^amnesia] Memory storage can fail without consciousness disappearing at the same time.
+
+The analogy also breaks in useful ways. A brain has no external caller: it does not sit idle waiting for a request, so whatever marks the edge of a conscious “moment” must arise within the system itself.[^rest] Nor is its persistence layer a database. Remembering reconstructs an event from pieces, and recall can change what is stored.[^memory] A better engineering image may be a self-running, recurrent process with a persistence mechanism that compresses, reconstructs, and updates its own state.
+
+This connects with a broader architectural idea behind the project: consciousness may be more useful to model as an activity emerging from the coordination of processes than as a single object or store. Attention, working memory, recurrent processing, long-term memory, and self-monitoring are not interchangeable, but an architectural framework can help us ask how they interact. The stateless-service analogy isolates one part of that larger question—what crosses a boundary between moments—rather than explaining the whole system.
+
+Philosophers have also examined how we experience time. Their accounts include snapshot-like experiences, experiences that retain traces of the just-past, and experiences that extend over time.[^time] The middle option resembles a stateless computation supplied with recent context. The engineering perspective adds questions about the amount of context carried forward, how it is represented, and how often it is refreshed.
+
+## What this does not touch
+
+None of this explains why any of it is experienced.
+
+Everything above concerns information and organisation: what persists, what is lost, how processing is coordinated, and when changes occur. We could build a system with all these properties and still not know whether anything is felt from the inside. That is the hard problem, and changing the vocabulary does not make it disappear.[^hard]
+
+Some theories suggest that the distinction I treated as a possible relabelling is fundamental. Under Integrated Information Theory, a system that loops back on itself and a stateless copy that behaves identically may differ in consciousness. If so, that difference may not be detectable through behaviour alone—a point at the centre of the debate around such theories.[^unfolding] I do not know how to settle this, and I do not want to pretend that the software framing settles it. The architecture is a way to make hypotheses explicit and compare them, not proof that a particular arrangement produces subjective experience.
+
+## Where this goes next
+
+My conclusion so far is deliberately modest. The experiments do not establish that consciousness is a stateless service. They give me three useful things I did not have before: a clearer distinction between state within a moment and state carried across moments; the realisation that “stateless” depends on where the system boundary is drawn; and a testable prediction that imperfect handoffs can produce boundary-linked forgetting.
+
+The next step is to ask the major theories of consciousness the same architectural questions. Where does each theory locate state? How does it explain recurrent processing and coordination? What defines a moment, and what information carries forward? Which parts of the system store, transform, or reconstruct context? If the theories give different answers, the questions will help distinguish them. If they do not, that is worth knowing too.
+
+The notes, sources, and code are public, and I would welcome being told where I am wrong.
+
+[^repo]: The project is at [github.com/harshmangalamv/consciousness-architecture](https://github.com/harshmangalamv/consciousness-architecture). The detailed version of this essay is research/statelessness-hypothesis.md.
+[^old]: Philip Johnson-Laird (1983) framed consciousness as an operating system; Daniel Dennett, *Consciousness Explained* (1991), as a virtual machine; Bernard Baars (1988) as a global workspace, a blackboard many processes can read.
+[^exp]: Experiment 00, boundary relativity: 400 steps, fixed seed, standard-library Python. [Results](https://github.com/harshmangalamv/consciousness-architecture/blob/main/experiments/00-boundary-relativity/results.md).
+[^synapse]: Mongillo, Barak and Tsodyks, "Synaptic Theory of Working Memory", Science, 2008. [doi:10.1126/science.1150769](https://doi.org/10.1126/science.1150769). Whether working memory lives mainly in sustained activity or in synapses is still argued over.
+[^doorway]: Radvansky and Copeland, "Walking through doorways causes forgetting", Memory & Cognition, 2006. [doi:10.3758/BF03193261](https://doi.org/10.3758/BF03193261).
+[^change]: Simons and Levin, "Change blindness", Trends in Cognitive Sciences, 1997. [doi:10.1016/S1364-6613(97)01080-2](https://doi.org/10.1016/S1364-6613(97)01080-2).
+[^sleep]: Massimini et al., "Breakdown of Cortical Effective Connectivity During Sleep", Science, 2005. [doi:10.1126/science.1117256](https://doi.org/10.1126/science.1117256).
+[^amnesia]: Wilson, Baddeley and Kapur, "Dense amnesia in a professional musician following herpes simplex virus encephalitis", 1995. [doi:10.1080/01688639508405157](https://doi.org/10.1080/01688639508405157).
+[^rest]: Raichle et al., "A default mode of brain function", PNAS, 2001. [doi:10.1073/pnas.98.2.676](https://doi.org/10.1073/pnas.98.2.676).
+[^memory]: Schacter and Addis, "The cognitive neuroscience of constructive memory", Phil. Trans. R. Soc. B, 2007. [doi:10.1098/rstb.2007.2087](https://doi.org/10.1098/rstb.2007.2087).
+[^time]: Barry Dainton, ["Temporal Consciousness"](https://plato.stanford.edu/entries/consciousness-temporal/), *Stanford Encyclopedia of Philosophy*, 2023. He calls the three families cinematic, retentional and extensional.
+[^hard]: David Chalmers, ["Facing Up to the Problem of Consciousness"](https://consc.net/papers/facing.html), *Journal of Consciousness Studies*, 1995.
+[^unfolding]: Doerig, Schurger, Hess and Herzog, "The unfolding argument", Consciousness and Cognition, 2019. [doi:10.1016/j.concog.2019.04.002](https://doi.org/10.1016/j.concog.2019.04.002).
