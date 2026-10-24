@@ -17,7 +17,7 @@ import * as t from "./lib/templates.mjs";
 import * as seo from "./lib/seo.mjs";
 
 // Top-level paths the site itself uses; a post can never take these URLs.
-const RESERVED = ["archive", "assets", "css", "data", "js", "feed", "rss", "atom", "page", "tag", "tags", "search", "404", "index"];
+const RESERVED = ["start-here", "archive", "assets", "css", "data", "js", "feed", "rss", "atom", "page", "tag", "tags", "search", "404", "index"];
 
 const hash = (data) => createHash("sha256").update(data).digest("hex").slice(0, 10);
 
@@ -46,7 +46,7 @@ export async function build({ root = process.cwd(), outDir = path.join(root, "di
   const site = { language: "en", pageSize: 10, feedSize: 20, ...config, url: config.url.replace(/\/+$/, "") };
 
   // ---- content ---------------------------------------------------------
-  const all = await readPosts(root, { drafts });
+  const all = await readPosts(root, { drafts, style: config.style });
   const pages = await readPages(root);
   const published = all.filter((p) => !p.draft);
   const draftPosts = drafts ? all.filter((p) => p.draft) : [];
@@ -113,11 +113,50 @@ export async function build({ root = process.cwd(), outDir = path.join(root, "di
 
   if (pages.about) site.aboutUrl = `${site.url}/about/`;
 
+  // Essays can be referenced by URL name (current or old) or by file id.
+  const live = posts.filter((p) => !p.draft);
+  const byRef = new Map();
+  for (const p of live) for (const ref of [p.slug, ...p.aliases, p.id]) byRef.set(ref, p);
+  const resolve = (ref) => byRef.get(String(ref).trim().replace(/^\/+|\/+$/g, ""));
+
+  // "Related:" headers -> "Read these next" at the end of an essay.
+  const refErrors = [];
+  for (const post of posts) {
+    post.relatedPosts = [];
+    for (const ref of post.related) {
+      const target = resolve(ref);
+      if (!target) refErrors.push(`${post.id}: "Related: ${ref}" is not a published essay. Use its URL name, e.g. ${live[0]?.slug || "moon"}.`);
+      else if (target === post) refErrors.push(`${post.id}: "Related:" lists the essay itself.`);
+      else if (!post.relatedPosts.includes(target)) post.relatedPosts.push(target);
+    }
+  }
+
+  // Start here: hand-picked essays for first-time readers (site.config.json -> startHere).
+  let startHere = null;
+  if (site.startHere?.essays?.length) {
+    const picks = [];
+    for (const ref of site.startHere.essays) {
+      const target = resolve(ref);
+      if (!target) refErrors.push(`site.config.json startHere: "${ref}" is not a published essay.`);
+      else if (!picks.includes(target)) picks.push(target);
+    }
+    startHere = { intro: site.startHere.intro || "", posts: picks };
+  }
+  if (refErrors.length) throw new ContentError(refErrors.join("\n"));
+
+  // House style: report capitals the lowercase rule was unsure about (kept as written).
+  for (const post of posts) {
+    if (post.styleReport?.unsure.length) {
+      log(`  style: ${post.id}: kept "${post.styleReport.unsure.join('", "')}" capitalized at a sentence start. If it is a name, add it to site.config.json → style.keepCapitalized to silence this; if not, lowercase it in the file.`);
+    }
+  }
+
   // Sidebar archive lists published essays only (never drafts), newest first.
   site.sidebarPosts = posts.filter((p) => !p.draft);
 
   site.nav = [
     { key: "home", label: "Home", href: "/" },
+    ...(startHere ? [{ key: "start-here", label: "Start here", href: "/start-here/" }] : []),
     { key: "archive", label: "Archive", href: "/archive/" },
     ...Object.entries(pages).map(([name, pg]) => ({ key: name, label: pg.title, href: `/${name}/` })),
   ];
@@ -184,12 +223,26 @@ export async function build({ root = process.cwd(), outDir = path.join(root, "di
       path: "/",
       current: "home",
       structured: [seo.website(site), seo.person(site)],
-      body: t.homeBody(previews.slice(0, site.pageSize).join("\n"), { pages: pageCount, prefix, key: feedKey }, site),
+      body: t.homeBody(previews.slice(0, site.pageSize).join("\n"), { pages: pageCount, prefix, key: feedKey }, site, Boolean(startHere)),
       scripts: pageCount > 1 ? [site.assets.feedJs] : [],
     })
   );
 
   // Archive, standalone pages, 404
+  if (startHere) {
+    await writeFile(
+      resolvedOut,
+      "start-here/index.html",
+      t.layout(site, {
+        title: `Start here · ${site.title}`,
+        description: startHere.intro || `Where to begin on ${site.title}.`,
+        path: "/start-here/",
+        current: "start-here",
+        body: t.startHereBody(startHere),
+      })
+    );
+  }
+
   await writeFile(
     resolvedOut,
     "archive/index.html",
@@ -229,7 +282,6 @@ export async function build({ root = process.cwd(), outDir = path.join(root, "di
   );
 
   // Feed, sitemap, robots (published posts only)
-  const live = posts.filter((p) => !p.draft);
   const updated = live[0]?.date || "1970-01-01";
   await writeFile(resolvedOut, "feed.xml", t.atomFeed(site, live.slice(0, site.feedSize), updated));
   await writeFile(
@@ -238,6 +290,7 @@ export async function build({ root = process.cwd(), outDir = path.join(root, "di
     t.sitemap(site, [
       { path: "/", lastmod: live[0]?.date },
       { path: "/archive/", lastmod: live[0]?.date },
+      ...(startHere ? [{ path: "/start-here/" }] : []),
       ...Object.keys(pages).map((name) => ({ path: `/${name}/` })),
       ...live.map((p) => ({ path: `/${p.slug}/`, lastmod: p.date })),
     ])

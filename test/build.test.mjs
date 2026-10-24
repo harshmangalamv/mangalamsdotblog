@@ -10,7 +10,8 @@ import { assignSlugs, SlugError } from "../scripts/lib/slugs.mjs";
 import { slugify, formatDateLong, truncateWords, htmlToText } from "../scripts/lib/util.mjs";
 import { build } from "../scripts/build.mjs";
 import { encodeEmail } from "../scripts/encode-email.mjs";
-import { createDraft, publishDraft } from "../scripts/lib/drafts.mjs";
+import { createDraft, publishDraft, styleSource } from "../scripts/lib/drafts.mjs";
+import { lowercaseBody } from "../scripts/lib/style.mjs";
 
 const post = (text, file = "05-09-2026-1.txt") => parsePost(text, file);
 
@@ -504,6 +505,124 @@ test("build fails loudly on a broken post", async () => {
 test("page filenames must be URL-safe", async () => {
   const root = await fixture({ "pages_raw/About Me.txt": "Title: A\n\nB" });
   await assert.rejects(build({ root, log: () => {} }), /page filenames must be lowercase/);
+});
+
+// ---------------------------------------------------------------- house style
+
+const STYLE = { lowercaseFrom: "2026-10-24", keepCapitalized: ["Gandhi", "Bihar"] };
+
+test("style: sentence starts are lowercased, names keep their capitals", () => {
+  const r = lowercaseBody("The earth is round. In Bihar, I wrote. Gandhi walked.\n\nPatna is old. Patna again, in Patna.", STYLE);
+  assert.equal(r.text, "the earth is round. in Bihar, I wrote. Gandhi walked.\n\nPatna is old. Patna again, in Patna.");
+  assert.deepEqual(r.changes, ["The → the", "In → in"]);
+});
+
+test("style: unknown words are kept and reported, never guessed", () => {
+  const r = lowercaseBody("Zorblax rules here.", STYLE);
+  assert.equal(r.text, "Zorblax rules here.");
+  assert.deepEqual(r.unsure, ["Zorblax"]);
+  // Seen in lowercase elsewhere in the post: an ordinary word.
+  assert.equal(lowercaseBody("Escalators hum. we ride escalators.", STYLE).text, "escalators hum. we ride escalators.");
+});
+
+test("style: quotes, links, code, block quotes, tables, comments, acronyms and wrapped lines are left alone", () => {
+  const src = [
+    '"The quote stays." [The link](/x/) stays.',
+    "> The block quote stays.",
+    "| The | table |",
+    "|---|---|",
+    "| x | y |",
+    "<!-- The comment stays. -->",
+    "LLMs are new. `The code` stays.",
+    "a line that wraps before the",
+    "Word on the next line.",
+    "## The heading goes lower",
+    "- The list item goes lower",
+  ].join("\n");
+  const out = lowercaseBody(src, STYLE).text.split("\n");
+  assert.equal(out[0], '"The quote stays." [The link](/x/) stays.');
+  assert.equal(out[1], "> The block quote stays.");
+  assert.equal(out[2], "| The | table |");
+  assert.equal(out[5], "<!-- The comment stays. -->");
+  assert.equal(out[6], "LLMs are new. `The code` stays.");
+  assert.equal(out[8], "Word on the next line.");
+  assert.equal(out[9], "## the heading goes lower");
+  assert.equal(out[10], "- the list item goes lower");
+});
+
+test("style: applies from the cutoff date, and Case: overrides it", () => {
+  const p = (text, file) => parsePost(text, file, { style: STYLE });
+  assert.equal(p("Title: The old one\n\nThe body.", "23-10-2026-1.txt").title, "The old one");
+  const fresh = p("Title: The new one\nDescription: The gist.\n\nThe body. In Bihar.", "24-10-2026-1.txt");
+  assert.equal(fresh.title, "the new one");
+  assert.equal(fresh.description, "the gist.");
+  assert.equal(fresh.content, "<p>the body. in Bihar.</p>");
+  assert.equal(p("Title: The new one\nCase: standard\n\nThe body.", "24-10-2026-1.txt").title, "The new one");
+  assert.equal(p("Title: The old one\nCase: lower\n\nThe body.", "01-01-2020-1.txt").title, "the old one");
+  assert.throws(() => p("Title: x\nCase: upper\n\ny", "24-10-2026-1.txt"), /"Case:" must be/);
+  // Without a style config, nothing changes.
+  assert.equal(post("Title: The one\n\nThe body.", "24-10-2026-1.txt").title, "The one");
+});
+
+test("style: publishing rewrites the draft file itself", async () => {
+  const styled = styleSource("Title: The lamp\nCase: lower\n\nThe flame. In Bihar.\n", "2020-01-01", null);
+  assert.equal(styled.text, "Title: the lamp\nCase: lower\n\nthe flame. in Bihar.\n");
+  assert.equal(styleSource("Title: The lamp\n\nThe flame.\n", "2026-10-23", STYLE).text, "Title: The lamp\n\nThe flame.\n");
+
+  const root = await fixture({ "site.config.json": JSON.stringify({ title: "t", url: "https://t.blog/", author: "A", description: "D", style: STYLE }) });
+  await fs.mkdir(path.join(root, "drafts"));
+  await fs.writeFile(path.join(root, "drafts/20-10-2026-1.txt"), "Title: The lamp\n\nThe flame flickers. Zorblax.\n");
+  let report;
+  const dest = await publishDraft(root, "20-10-2026-1", { now: new Date(2026, 9, 25, 9, 0), report: (r) => (report = r) });
+  assert.equal(await fs.readFile(dest, "utf8"), "Title: the lamp\n\nthe flame flickers. Zorblax.\n");
+  assert.deepEqual(report.unsure, ["Zorblax"]);
+});
+
+// ---------------------------------------------------------------- reader paths
+
+test("related essays: listed after the essay, by slug, old slug or id; bad refs fail", async () => {
+  const files = {
+    "posts_raw/01-01-2026-1.txt": "Title: Lamp\n\nLight.",
+    "posts_raw/02-01-2026-1.txt": "Title: Wick\nSlug: wick-new\n\nThread.",
+    "posts_raw/03-01-2026-1.txt": "Title: Oil\nRelated: lamp, wick-old, 01-01-2026-1\n\nFuel.",
+    "slugs.json": JSON.stringify({ "01-01-2026-1": ["lamp"], "02-01-2026-1": ["wick-new", "wick-old"] }),
+  };
+  const root = await fixture(files);
+  await build({ root, log: () => {} });
+  const html = await read(root, "oil/index.html");
+  assert.match(html, /<nav class="related" aria-labelledby="related-label"><h2 id="related-label">Read these next<\/h2>/);
+  assert.match(html, /href="\/lamp\/">Lamp<\/a>.*href="\/wick-new\/">Wick<\/a>/s);
+  const related = html.match(/<nav class="related"[\s\S]*?<\/nav>/)[0];
+  assert.equal(related.match(/href="\/lamp\/"/g).length, 1); // listed once even if named twice
+  assert.doesNotMatch(await read(root, "lamp/index.html"), /class="related"/);
+
+  for (const [ref, msg] of [["nope", /not a published essay/], ["oil", /itself/]]) {
+    const bad = await fixture({ ...files, "posts_raw/03-01-2026-1.txt": `Title: Oil\nRelated: ${ref}\n\nFuel.` });
+    await assert.rejects(build({ root: bad, log: () => {} }), msg);
+  }
+  const draftRef = await fixture({ ...files, "posts_raw/04-01-2026-1.txt": "Title: Soon\nStatus: draft\n\nx", "posts_raw/03-01-2026-1.txt": "Title: Oil\nRelated: 04-01-2026-1\n\nFuel." });
+  await assert.rejects(build({ root: draftRef, log: () => {} }), /not a published essay/);
+});
+
+test("start here: page, nav link, home pointer and sitemap; only when configured", async () => {
+  const cfg = { title: "t.blog", url: "https://t.blog/", author: "A", description: "D", startHere: { intro: "Begin *here*.", essays: ["lamp"] } };
+  const root = await fixture({ "site.config.json": JSON.stringify(cfg), "posts_raw/01-01-2026-1.txt": "Title: Lamp\nDescription: About light.\n\nLight." });
+  await build({ root, log: () => {} });
+  const page = await read(root, "start-here/index.html");
+  assert.match(page, /<h1>Start here<\/h1>/);
+  assert.match(page, /<em>here<\/em>/);
+  assert.match(page, /<a href="\/lamp\/">Lamp<\/a><\/h2>\s*<p class="excerpt">About light.<\/p>/);
+  assert.match(page, /href="\/start-here\/" aria-current="page"/);
+  assert.match(await read(root, "index.html"), /class="start-pointer">.*href="\/start-here\/"/);
+  assert.match(await read(root, "sitemap.xml"), /https:\/\/t.blog\/start-here\//);
+
+  const plain = await fixture({ "posts_raw/01-01-2026-1.txt": "Title: Lamp\n\nLight." });
+  await build({ root: plain, log: () => {} });
+  assert.equal(await has(plain, "start-here/index.html"), false);
+  assert.doesNotMatch(await read(plain, "index.html"), /start-here/);
+
+  const bad = await fixture({ "site.config.json": JSON.stringify({ ...cfg, startHere: { essays: ["gone"] } }), "posts_raw/01-01-2026-1.txt": "Title: Lamp\n\nLight." });
+  await assert.rejects(build({ root: bad, log: () => {} }), /startHere.*gone/s);
 });
 
 test("the real repository builds", async () => {

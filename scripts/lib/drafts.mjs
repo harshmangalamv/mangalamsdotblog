@@ -4,6 +4,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { parsePost } from "./content.mjs";
+import { lowercaseBody } from "./style.mjs";
 
 const pad = (n) => String(n).padStart(2, "0");
 
@@ -62,7 +63,41 @@ function publishHeader(text, isoDate) {
   return out.join("\n");
 }
 
-export async function publishDraft(root, name, { now = new Date(), keepDate = false } = {}) {
+async function readStyle(root) {
+  try {
+    return JSON.parse(await fs.readFile(path.join(root, "site.config.json"), "utf8")).style || null;
+  } catch (err) {
+    if (err.code === "ENOENT") return null;
+    throw err;
+  }
+}
+
+// Applies the house style (lowercase sentence starts) to the source file itself, so
+// the file in posts_raw/ reads the same as the site. "Case: standard" opts out.
+// Returns { text, changes, unsure }.
+export function styleSource(text, isoDate, style) {
+  const nl = text.indexOf("\n\n");
+  const head = nl === -1 ? text : text.slice(0, nl);
+  const body = nl === -1 ? "" : text.slice(nl);
+  const caseLine = /^case\s*:\s*(.*)$/im.exec(head);
+  const mode = caseLine ? caseLine[1].trim().toLowerCase() : "";
+  const on = mode === "lower" || (!mode && style?.lowercaseFrom && isoDate >= style.lowercaseFrom);
+  if (!on) return { text, changes: [], unsure: [] };
+  const values = [...head.matchAll(/^\s*(?:title|description)\s*:\s*(.*)$/gim)].map((m) => m[1]);
+  const opts = { keepCapitalized: style?.keepCapitalized || [], context: [...values, body].join("\n\n") };
+  const changes = [];
+  const unsure = new Set();
+  const take = (r) => {
+    changes.push(...r.changes);
+    r.unsure.forEach((w) => unsure.add(w));
+    return r.text;
+  };
+  const newHead = head.replace(/^(\s*(?:title|description)\s*:\s*)(.*)$/gim, (_, k, v) => k + take(lowercaseBody(v, opts)));
+  const newBody = take(lowercaseBody(body, opts));
+  return { text: newHead + newBody, changes, unsure: [...unsure] };
+}
+
+export async function publishDraft(root, name, { now = new Date(), keepDate = false, style, report } = {}) {
   const { base, candidates } = resolveDraft(root, name);
   let source = null;
   for (const c of candidates) {
@@ -85,7 +120,9 @@ export async function publishDraft(root, name, { now = new Date(), keepDate = fa
     target = await nextFree([postsDir], localDate(now));
   }
   const [dd, mm, yyyy] = target.split("-");
-  const published = publishHeader(text, `${yyyy}-${mm}-${dd}`);
+  const styled = styleSource(publishHeader(text, `${yyyy}-${mm}-${dd}`), `${yyyy}-${mm}-${dd}`, style === undefined ? await readStyle(root) : style);
+  const published = styled.text;
+  report?.(styled);
   parsePost(published, `${target}.txt`); // the published file must be valid too
 
   const dest = path.join(postsDir, `${target}.txt`);

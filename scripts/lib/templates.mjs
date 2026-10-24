@@ -1,7 +1,7 @@
 // Build-time HTML templates. Every interpolated value is escaped unless it is
 // already-rendered HTML (post bodies from markup.mjs, or other templates).
 
-import { escapeHtml as e, formatDateLong } from "./util.mjs";
+import { escapeHtml as e, formatDateLong, truncateWords } from "./util.mjs";
 import { jsonLd } from "./seo.mjs";
 import { renderInline } from "./markup.mjs";
 
@@ -127,6 +127,15 @@ function contents(post) {
   return `\n  <nav class="toc" aria-labelledby="toc-label"><h2 id="toc-label">Contents</h2><ol>${items}</ol></nav>`;
 }
 
+// "Read these next": essays the author linked with a "Related:" header.
+function relatedNav(post) {
+  if (!post.relatedPosts?.length) return "";
+  const items = post.relatedPosts
+    .map((p) => `<li><a href="/${e(p.slug)}/">${e(p.title)}</a> <time datetime="${e(p.date)}">${e(formatDateLong(p.date))}</time></li>`)
+    .join("");
+  return `\n  <nav class="related" aria-labelledby="related-label"><h2 id="related-label">Read these next</h2><ul>${items}</ul></nav>`;
+}
+
 export function postBody(post, { older, newer }) {
   const draft = post.draft ? `<p class="draft-banner">Draft. Only visible in local preview.</p>\n` : "";
   const cell = (p, cls, label, rel) =>
@@ -143,15 +152,16 @@ export function postBody(post, { older, newer }) {
   </header>${contents(post)}
   <div class="prose">
 ${post.content}
-  </div>
+  </div>${relatedNav(post)}
 ${seriesNav(post)}
 </article>${nav}`;
 }
 
-export function homeBody(firstPageHtml, feed, site) {
+export function homeBody(firstPageHtml, feed, site, hasStartHere = false) {
   if (!firstPageHtml) return `<p class="empty">The first essay is on its way.</p>`;
   const attrs = feed.pages > 1 ? ` data-pages="${feed.pages}" data-prefix="${e(feed.prefix)}" data-key="${e(feed.key)}"` : "";
-  return `<h1 class="visually-hidden">${e(site.title)}</h1>
+  const pointer = hasStartHere ? `\n<p class="start-pointer">New here? <a href="/start-here/">Start with a few chosen essays</a>.</p>` : "";
+  return `<h1 class="visually-hidden">${e(site.title)}</h1>${pointer}
 <div id="feed" class="feed"${attrs}>
 ${firstPageHtml}
 </div>
@@ -345,4 +355,24 @@ ${groups}
   return `    <aside class="sidebar" aria-label="About this blog">
 ${blocks.join("\n")}
     </aside>`;
+}
+
+// Start here: a short intro and hand-picked essays for first-time readers.
+export function startHereBody({ intro, posts }) {
+  const introHtml = intro ? `\n  <div class="prose"><p>${renderInline(intro)}</p></div>` : "";
+  const items = posts
+    .map(
+      (p) => `    <li>
+      <h2><a href="/${e(p.slug)}/">${e(p.title)}</a></h2>
+      <p class="excerpt">${e(p.description || truncateWords(p.text, 180))}</p>
+    </li>`
+    )
+    .join("\n");
+  return `<article class="post start-here">
+  <header class="post-header"><h1>Start here</h1></header>${introHtml}
+  <ul class="start-list">
+${items}
+  </ul>
+  <p class="feed-end"><a href="/archive/">Every essay, by year</a></p>
+</article>`;
 }

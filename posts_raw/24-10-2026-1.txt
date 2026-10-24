@@ -1,4 +1,5 @@
 Title: the hopping monkey
+Related: one-and-two
 Description: we walk on escalators and weave through traffic to save a few seconds. a monkey has no such urgency. does any of it matter?
 
 there are people who walk on a running escalator. just in to reach somewhere quicker. they might be returning after a tiring day at the work, or maybe running late for the next bus to home at the airport.

@@ -32,10 +32,11 @@ Every page is complete HTML, so it works with JS disabled. The only JS is `src/f
 | `scripts/lib/slugs.mjs` | URL registry logic (`assignSlugs`) |
 | `scripts/lib/templates.mjs` | all HTML/XML templates. Escapes every value except pre-rendered HTML |
 | `scripts/lib/seo.mjs` | schema.org JSON-LD: WebSite + Person (home), BlogPosting (posts), ProfilePage (about). Person.sameAs = `site.config.json` → `profiles` |
+| `scripts/lib/style.mjs` | house style: lowercases sentence starts, keeps names (keep list, mid-sentence capitals, acronyms); unknown words are kept and reported as "unsure", never guessed. Skips quotes, link text, code, `>` quotes, tables, comments |
 | `scripts/lib/util.mjs` | escape, slugify (ASCII only), UTC date formatting, excerpt truncation |
 | `scripts/serve.mjs` | local server mimicking Pages (301 to trailing slash, 404.html with status 404) |
 | `scripts/encode-email.mjs` / `src/contact.js` | scramble / click-to-reveal email (`{{email}}` in pages_raw only). Same XOR KEY in both |
-| `scripts/new-post.mjs` / `scripts/publish-draft.mjs` / `scripts/lib/drafts.mjs` | `npm run new` → `drafts/` (gitignored, local only); `npm run publish-draft -- <name> [--keep-date]` → moves into `posts_raw/` dated today, drops `Status:`, updates `Date:` |
+| `scripts/new-post.mjs` / `scripts/publish-draft.mjs` / `scripts/lib/drafts.mjs` | `npm run new` → `drafts/` (gitignored, local only); `npm run publish-draft -- <name> [--keep-date]` → moves into `posts_raw/` dated today, drops `Status:`, updates `Date:`, applies the house style to the file (`styleSource`) and reports unsure words |
 | `test/build.test.mjs` | node:test: markup, parser, slugs, dates, an end-to-end fixture build, and a build of the real repo |
 | `.github/workflows/deploy.yml` | push to master → test → build → commit slugs.json if new → upload → deploy |
 | `css/style.css` | one stylesheet, token-based (`:root` vars; dark values under `prefers-color-scheme`). Essay column (`--measure` 36rem) + sidebar (`--side` 15rem) from 64rem up; one column below that (sidebar after the essay). Header + footer, print styles |
@@ -43,10 +44,12 @@ Every page is complete HTML, so it works with JS disabled. The only JS is `src/f
 ## Post format
 
 Filename `dd-mm-yyyy-N.txt`. The filename date is the source of truth. Header lines `Key: value` run until the first blank line or the first line that is not a `Key:` line.
-Keys: `Title` (required), `Date` (optional, must equal the filename date), `Status` (`published`|`draft`), `Slug`, `Description`, `Series`. Unknown keys fail the build.
+Keys: `Title` (required), `Date` (optional, must equal the filename date), `Status` (`published`|`draft`), `Slug`, `Description`, `Series`, `Related` (comma-separated slug / old slug / id of published essays → "Read these next"; unknown, draft or self refs fail), `Case` (`lower`|`standard`). Unknown keys fail the build.
+House style: posts dated ≥ `site.config.json` → `style.lowercaseFrom` (2026-10-24) start sentences in lowercase, applied at build time and written into the file by publish-draft; `Case:` overrides. Older posts must render unchanged.
+Start here: `site.config.json` → `startHere` {intro, essays[]} → `/start-here/`, first nav item, a pointer line on home, sitemap entry. Not in the AI `limitedAllow` list.
 Body syntax: README.md › Formatting. Writer-facing guide: WRITING.md. Example of every feature: `examples/long-essay.txt` (never built; a test keeps it valid).
 Drafts: `drafts/` is gitignored and read only by `build --drafts`; a broken draft can't block a deploy. Never commit drafts; never add `drafts/` back to git.
-Markup extras: footnotes `[^id]` + `[^id]: …` (strict: missing/unused/duplicate fail), pipe tables (strict cell counts), `<!-- comments -->` stripped. Series = posts sharing a `Series:` name, ordered by date. Contents list when a post has ≥4 `##`. Page-owned ids (main, notes, series, toc-label, …) are reserved from heading ids.
+Markup extras: footnotes `[^id]` + `[^id]: …` (strict: missing/unused/duplicate fail), pipe tables (strict cell counts), `<!-- comments -->` stripped. Series = posts sharing a `Series:` name, ordered by date. Contents list when a post has ≥4 `##`. Page-owned ids (main, notes, series, toc-label, related-label, …) are reserved from heading ids.
 
 ## Invariants (do not break)
 
@@ -58,7 +61,7 @@ Markup extras: footnotes `[^id]` + `[^id]: …` (strict: missing/unused/duplicat
 6. **Stay dependency-free and static.** Prefer build-time work over runtime JS.
 7. **Never write the owner's email in plain text** anywhere (repo files, pages, feed, JSON-LD, commit messages). Only the scrambled `contact` value + `{{email}}`.
 8. **Content control**: essays are © all rights reserved (LICENSE); AI training crawlers fully disallowed, AI answer/user fetchers limited to `/`, `/archive/`, `/about/` (config → robots.txt); TDM opt-out via `/.well-known/tdmrep.json` (workflow uploads hidden files) + meta. Don't loosen without the owner asking.
-9. Reserved top-level names: archive, assets, css, data, js, feed, rss, atom, page, tag, tags, search, 404, index, plus every `pages_raw` name.
+9. Reserved top-level names: start-here, archive, assets, css, data, js, feed, rss, atom, page, tag, tags, search, 404, index, plus every `pages_raw` name.
 
 ## Design system ("ink by day, lamplight by night")
 
@@ -69,6 +72,7 @@ Markup extras: footnotes `[^id]` + `[^id]: …` (strict: missing/unused/duplicat
 - Wordmark (site name, top left): 22→28px regular weight, always smaller than essay titles (32→42px bold). Nav links stay 15px muted.
 - No all-caps labels, no `→` arrows, no cards or shadows. Structure comes from whitespace; hairline rules only where they separate the essay from navigation.
 - Section headings get ids and link to themselves; links/footnotes inside headings are rejected by the build.
+- "Read these next" (after the prose, before the series box) and the home "New here?" pointer follow the same muted, hairline style.
 - Footnotes, contents and the series box are muted, small, and use hairline rules, never an accent colour.
 - Reading time shows only for essays of 3+ minutes (230 wpm).
 

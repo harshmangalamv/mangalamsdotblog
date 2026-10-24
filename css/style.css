@@ -627,6 +627,86 @@ main {
     text-decoration: underline;
 }
 
+/* "Read these next": essays the author linked to this one */
+.related {
+    margin-top: 2.75rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+}
+
+.related h2 {
+    margin: 0 0 0.6rem 0;
+    color: var(--muted);
+    font-size: 0.9375rem;
+    font-weight: 400;
+}
+
+.related ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.related li + li {
+    margin-top: 0.4rem;
+}
+
+.related a {
+    text-decoration: none;
+}
+
+.related a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+}
+
+.related time {
+    margin-left: 0.5em;
+    color: var(--muted);
+    font-size: 0.8125rem;
+}
+
+/* Start here: the pointer on the home page, and the page itself */
+.start-pointer {
+    margin: 0 0 2.25rem 0;
+    color: var(--muted);
+    font-size: 0.9375rem;
+}
+
+.start-list {
+    margin: 2rem 0 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.start-list li + li {
+    margin-top: 1.75rem;
+}
+
+.start-list h2 {
+    margin: 0 0 0.3rem 0;
+    font-size: 1.3rem;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+}
+
+.start-list h2 a {
+    color: var(--ink);
+    text-decoration: none;
+}
+
+.start-list h2 a:hover {
+    color: var(--link);
+}
+
+.start-list .excerpt {
+    margin: 0;
+    color: var(--body);
+}
+
 .series-note {
     margin: 0.35rem 0 0 0;
     color: var(--muted);
@@ -813,6 +893,8 @@ main {
     }
 
     .toc,
+    .related,
+    .start-pointer,
     .fn-back {
         display: none;
     }

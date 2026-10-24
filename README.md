@@ -27,7 +27,8 @@ Second paragraph.
 ```
 
 - **Filename** `dd-mm-yyyy-N.txt` (N = 1, 2, 3… for that day). The filename date is the post's date. `Date:` is optional, and if present must match the filename.
-- **Headers** (before the first blank line): `Title:` (required), `Date:`, `Status: draft` (left out of the published site), `Slug:` (custom URL), `Description:` (custom summary for search engines and link previews), `Series:` (links essays with the same series name as Part 1, 2, …).
+- **Headers** (before the first blank line): `Title:` (required), `Date:`, `Status: draft` (left out of the published site), `Slug:` (custom URL), `Description:` (custom summary for search engines and link previews), `Series:` (links essays with the same series name as Part 1, 2, …), `Related:` (comma-separated URL names of published essays, listed as "Read these next" at the end), `Case:` (`lower` or `standard`; see House style).
+- **House style**: from 24 October 2026, sentences start in lowercase and names keep their capitals. `npm run publish-draft` rewrites the file this way and lists any capitalised word it was unsure about (names it doesn't know); the build applies the same rule. Add names to `site.config.json` → `style.keepCapitalized`. `Case: standard` opts a post out. Older posts are untouched.
 - **Drafts** live in `drafts/`, which is gitignored, so unfinished writing never reaches GitHub. `npm run publish-draft` moves a draft into `posts_raw/`; then `npm run build`, commit `posts_raw/` and `slugs.json`, and push. `Status: draft` still works as a safety net for a file in `posts_raw/`.
 
 ### Formatting
@@ -84,6 +85,10 @@ The second column (beside essays on wide screens, below them on phones) is set i
 - `intro`: the short hello (inline formatting allowed: `*italic*`, `[link](https://…)`).
 - `blogroll`: a list of `{ "name": …, "url": … }` for "Blogs I read".
 The archive by year is built automatically from published posts.
+
+## Start here
+
+`site.config.json` → `startHere` (`intro` plus a list of essay URL names) builds `/start-here/`, adds "Start here" first in the menu and a one-line pointer above the home feed. Remove `startHere` to turn all three off. A name that isn't a published essay stops the build.
 
 ## Other pages
 

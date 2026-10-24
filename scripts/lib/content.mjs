@@ -6,12 +6,13 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { renderBody, MarkupError } from "./markup.mjs";
 import { parseIsoDate, SLUG_PATTERN, htmlToText } from "./util.mjs";
+import { lowercaseBody } from "./style.mjs";
 
 export class ContentError extends Error {}
 
 const POST_FILENAME = /^(\d{2})-(\d{2})-(\d{4})-(\d+)\.(txt|md)$/i;
 const HEADER_LINE = /^([A-Za-z][A-Za-z-]*)\s*:\s*(.*)$/;
-const POST_KEYS = new Set(["title", "date", "slug", "status", "description", "series"]);
+const POST_KEYS = new Set(["title", "date", "slug", "status", "description", "series", "related", "case"]);
 const PAGE_KEYS = new Set(["title", "description"]);
 const STATUSES = new Set(["published", "draft"]);
 
@@ -53,7 +54,7 @@ function render(body, file) {
   }
 }
 
-export function parsePost(text, filename) {
+export function parsePost(text, filename, { style = null } = {}) {
   const m = POST_FILENAME.exec(filename);
   if (!m) {
     throw new ContentError(`${filename}: post filenames must be dd-mm-yyyy-N.txt (e.g. 05-09-2026-1.txt).`);
@@ -80,18 +81,45 @@ export function parsePost(text, filename) {
     throw new ContentError(`${filename}: "Slug: ${header.slug}" must be lowercase a-z, 0-9 and single hyphens.`);
   }
 
-  const content = render(body, filename);
+  // House style: lowercase sentence starts for new posts (see style.mjs).
+  const caseMode = (header.case || "").toLowerCase();
+  if (caseMode && !["lower", "standard"].includes(caseMode)) {
+    throw new ContentError(`${filename}: "Case:" must be "lower" or "standard".`);
+  }
+  const lowercase = caseMode === "lower" || (!caseMode && style?.lowercaseFrom && fileDate >= style.lowercaseFrom);
+  let title = header.title;
+  let description = header.description || null;
+  let source = body;
+  const styleReport = { changes: [], unsure: [] };
+  if (lowercase) {
+    const opts = { keepCapitalized: style?.keepCapitalized || [], context: `${title}\n\n${description || ""}\n\n${body}` };
+    const parts = [lowercaseBody(title, opts), description ? lowercaseBody(description, opts) : null, lowercaseBody(body, opts)];
+    [title, description, source] = [parts[0].text, parts[1] ? parts[1].text : null, parts[2].text];
+    for (const r of parts.filter(Boolean)) {
+      styleReport.changes.push(...r.changes);
+      styleReport.unsure.push(...r.unsure);
+    }
+    styleReport.unsure = [...new Set(styleReport.unsure)];
+  }
+
+  const related = header.related
+    ? header.related.split(",").map((r) => r.trim()).filter(Boolean)
+    : [];
+
+  const content = render(source, filename);
   if (!content.trim()) throw new ContentError(`${filename}: the body is empty.`);
 
   return {
     id: filename.replace(/\.(txt|md)$/i, ""),
-    title: header.title,
+    title,
     date: fileDate,
     seq: Number(n),
     slug: header.slug || null,
     draft: status === "draft",
-    description: header.description || null,
+    description,
     series: header.series || null,
+    related,
+    styleReport,
     content,
     text: htmlToText(content),
   };
@@ -120,7 +148,7 @@ async function listSourceFiles(dir) {
 // Published posts live in posts_raw/ (tracked by git). Drafts live in drafts/,
 // which is gitignored: they exist only on the writer's machine and are read only
 // for local previews (drafts: true). A broken draft can never block publishing.
-export async function readPosts(root, { drafts = false } = {}) {
+export async function readPosts(root, { drafts = false, style = null } = {}) {
   const sources = [["posts_raw", false]];
   if (drafts) sources.push(["drafts", true]);
 
@@ -131,7 +159,7 @@ export async function readPosts(root, { drafts = false } = {}) {
     const dir = path.join(root, folder);
     for (const file of await listSourceFiles(dir)) {
       try {
-        const post = parsePost(await fs.readFile(path.join(dir, file), "utf8"), file);
+        const post = parsePost(await fs.readFile(path.join(dir, file), "utf8"), file, { style });
         if (isDraft) post.draft = true;
         if (seen.has(post.id)) {
           throw new ContentError(`${folder}/${file}: a post named ${post.id} also exists in ${seen.get(post.id)}/. Rename one of them.`);

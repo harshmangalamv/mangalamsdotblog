@@ -43,6 +43,22 @@ Description: One or two sentences for search results and link previews.
 | `Series:` | for a series | Essays with exactly the same series name are linked as Part 1, Part 2, … in date order. |
 | `Slug:` | recommended for series | A short, permanent URL. Set it before the first publish; changing it later leaves a redirect behind. |
 | `Description:` | for long essays | What Google, WhatsApp and LinkedIn show. Without it, the opening lines are used. |
+| `Related:` | when it helps | Up to a few published essays, by their URL name: `Related: one-and-two, moon`. Listed under the essay as "Read these next". A wrong name stops the build. |
+| `Case:` | rarely | `standard` keeps normal capitals for this essay; `lower` applies the house style to an older one. |
+
+## House style: lowercase
+
+From 24 October 2026, sentences start in lowercase and names keep their capitals: "earth is round. in Bihar, it is…". Write however you like; publishing fixes it.
+
+- `npm.cmd run publish-draft` rewrites the file in this style and prints what it changed.
+- A capitalised word it doesn't recognise is **kept** and listed as "Kept capitalized (names?)". If it's a name, add it to `site.config.json` → `style.keepCapitalized` so it's never asked about again; if it's an ordinary word, lowercase it yourself.
+- A word you've written capitalised in the middle of a sentence elsewhere in the essay is treated as a name.
+- Quotations, link text, code, block quotes and tables are left as written. "I" in the middle of a sentence stays "I".
+- Titles and descriptions follow the same rule.
+
+## Start here
+
+The `/start-here/` page lists essays chosen for first-time readers. Edit `site.config.json` → `startHere` → `essays` (URL names, in the order to show) and `intro`.
 
 ## Body
 

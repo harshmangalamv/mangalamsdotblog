@@ -285,7 +285,7 @@ export function renderBody(raw) {
   });
 
   // Heading ids are unique within a post and never clash with ids the page itself uses.
-  const ids = new Set(["main", "notes", "footnotes-label", "series", "series-label", "toc-label", "side-hi", "side-reading", "side-archive"]);
+  const ids = new Set(["main", "notes", "footnotes-label", "series", "series-label", "toc-label", "side-hi", "side-reading", "side-archive", "related-label"]);
   const previous = notes;
   notes = createNotes(defs);
   try {

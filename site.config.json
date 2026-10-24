@@ -68,5 +68,57 @@
         "url": "https://fs.blog/"
       }
     ]
+  },
+  "startHere": {
+    "intro": "a few essays to begin with. each one stands on its own.",
+    "essays": [
+      "one-and-two",
+      "the-hopping-monkey",
+      "is-consciousness-a-stateless-service",
+      "compounding",
+      "moon"
+    ]
+  },
+  "style": {
+    "_comment": "Posts dated on or after lowercaseFrom start sentences in lowercase (names keep capitals). A post can opt out with 'Case: standard' or opt in with 'Case: lower'. Add names here if the build reports them as unsure.",
+    "lowercaseFrom": "2026-10-24",
+    "keepCapitalized": [
+      "Bihar",
+      "India",
+      "Indian",
+      "Patna",
+      "Hyderabad",
+      "Delhi",
+      "Mumbai",
+      "Kerala",
+      "Champaran",
+      "Gandhi",
+      "Einstein",
+      "Naval",
+      "Seth",
+      "Godin",
+      "God",
+      "English",
+      "Hindi",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ]
   }
 }
